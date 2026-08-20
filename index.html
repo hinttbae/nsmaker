@@ -523,7 +523,7 @@
     reader.onload = function(evt){
       const pinKey = `${targetPinInfo.catKey}_${targetPinInfo.optId}`;
       customPins[pinKey] = evt.target.result;
-      
+
       const currentSel = selections[targetPinInfo.catKey];
       if(currentSel && currentSel.id === targetPinInfo.optId){
         selectOption(targetPinInfo.catKey, targetPinInfo.optId, currentSel.label, evt.target.result);
