@@ -117,10 +117,19 @@
     overflow:hidden;
   }
 
+  /*
+    사진 비율 유지 + 칸에 맞춰 크롭
+
+    cover:
+    - 사진 원본 비율을 절대 변형하지 않음
+    - 정사각형 칸을 꽉 채움
+    - 칸보다 넘치는 부분만 잘라냄
+  */
   .op-photo img{
     width:100%;
     height:100%;
     object-fit:cover;
+    object-position:center center;
     display:block;
   }
 
@@ -249,6 +258,7 @@
     width:100%;
     height:100%;
     object-fit:cover;
+    object-position:center center;
     display:block;
   }
 
@@ -396,12 +406,14 @@
 
   /* =========================================================
      기본 이미지
-     아무 사진도 선택하지 않았을 때 이 이미지가 표시됩니다.
      ========================================================= */
   const DEFAULT_IMAGE = 'https://i.imgur.com/XEwY6gC.png';
 
 
-  // 순서: [최애 - 최애 떡밥 - 입덕 계기 - 릴스 - 코어 - 조합명 - 모에화 - 최애 포타]
+  /* =========================================================
+     카테고리 및 옵션
+     ========================================================= */
+
   const CATEGORIES = [
 
     {
@@ -589,9 +601,11 @@
 
 
   /* =========================================================
-     기본 이미지 HTML
+     기본 이미지 표시
      ========================================================= */
+
   function getDefaultImageHTML(){
+
     return `
       <img
         src="${DEFAULT_IMAGE}"
@@ -599,70 +613,102 @@
         crossorigin="anonymous"
       >
     `;
+
   }
 
 
   /* =========================================================
-     토스트 메시지
+     토스트
      ========================================================= */
+
   function showToast(text){
-    const t = document.getElementById('toast');
+
+    const t =
+      document.getElementById('toast');
 
     t.textContent = text;
+
     t.classList.add('show');
 
     setTimeout(() => {
+
       t.classList.remove('show');
+
     }, 2000);
+
   }
 
 
   /* =========================================================
-     표 초기 생성
+     그리드 초기화
      ========================================================= */
+
   function initGrid(){
 
-    const grid = document.getElementById('opGrid');
+    const grid =
+      document.getElementById('opGrid');
 
     grid.innerHTML = '';
 
+
     CATEGORIES.forEach(cat => {
 
-      const cell = document.createElement('div');
+      const cell =
+        document.createElement('div');
 
       cell.className = 'op-cell';
+
       cell.dataset.key = cat.key;
 
 
-      const head = document.createElement('div');
+      const head =
+        document.createElement('div');
 
       head.className = 'op-head';
+
       head.textContent = cat.name;
 
 
-      const photo = document.createElement('div');
+      const photo =
+        document.createElement('div');
 
       photo.className = 'op-photo';
+
       photo.id = `photo-${cat.key}`;
 
-      /* 변경된 부분:
-         기존 "선택 없음" 글자 대신 기본 이미지 표시 */
-      photo.innerHTML = getDefaultImageHTML();
+
+      /* 기본 이미지 */
+
+      photo.innerHTML =
+        getDefaultImageHTML();
 
 
-      const caption = document.createElement('div');
+      const caption =
+        document.createElement('div');
 
-      caption.className = 'op-caption placeholder';
-      caption.id = `caption-${cat.key}`;
+      caption.className =
+        'op-caption placeholder';
+
+      caption.id =
+        `caption-${cat.key}`;
 
       caption.contentEditable = true;
 
-      caption.setAttribute('spellcheck', 'false');
-      caption.setAttribute('data-placeholder', '직접 입력');
+      caption.setAttribute(
+        'spellcheck',
+        'false'
+      );
+
+      caption.setAttribute(
+        'data-placeholder',
+        '직접 입력'
+      );
 
 
       cell.appendChild(head);
+
       cell.appendChild(photo);
+
       cell.appendChild(caption);
 
       grid.appendChild(cell);
@@ -673,21 +719,28 @@
 
 
   /* =========================================================
-     탭 초기 생성
+     탭 초기화
      ========================================================= */
+
   function initTabs(){
 
-    const tabsContainer = document.getElementById('tabs');
+    const tabsContainer =
+      document.getElementById('tabs');
 
     tabsContainer.innerHTML = '';
 
+
     CATEGORIES.forEach((cat, idx) => {
 
-      const btn = document.createElement('button');
+      const btn =
+        document.createElement('button');
 
-      btn.className = `tab-btn ${
-        idx === currentCategoryIndex ? 'active' : ''
-      }`;
+      btn.className =
+        `tab-btn ${
+          idx === currentCategoryIndex
+            ? 'active'
+            : ''
+        }`;
 
       btn.textContent = cat.name;
 
@@ -697,6 +750,7 @@
         currentCategoryIndex = idx;
 
         renderTabs();
+
         renderOptions();
 
       };
@@ -710,19 +764,28 @@
 
 
   /* =========================================================
-     탭 활성화 상태
+     탭 렌더링
      ========================================================= */
+
   function renderTabs(){
 
-    const btns = document.querySelectorAll('.tab-btn');
+    const btns =
+      document.querySelectorAll(
+        '.tab-btn'
+      );
+
 
     btns.forEach((btn, idx) => {
 
       if(idx === currentCategoryIndex){
+
         btn.classList.add('active');
+
       }
       else{
+
         btn.classList.remove('active');
+
       }
 
     });
@@ -731,26 +794,36 @@
 
 
   /* =========================================================
-     옵션 출력
+     옵션 렌더링
      ========================================================= */
+
   function renderOptions(){
 
-    const body = document.getElementById('optionsBody');
+    const body =
+      document.getElementById(
+        'optionsBody'
+      );
 
     body.innerHTML = '';
 
-    const cat = CATEGORIES[currentCategoryIndex];
+
+    const cat =
+      CATEGORIES[currentCategoryIndex];
 
 
-    const row = document.createElement('div');
+    const row =
+      document.createElement('div');
 
-    row.className = 'options-row';
+    row.className =
+      'options-row';
 
 
-    /* 1. 프리셋 보기 출력 */
+    /* 프리셋 */
+
     cat.options.forEach(opt => {
 
-      const chip = document.createElement('div');
+      const chip =
+        document.createElement('div');
 
 
       const isSelected =
@@ -759,14 +832,20 @@
 
 
       chip.className =
-        `opt-chip ${isSelected ? 'selected' : ''}`;
+        `opt-chip ${
+          isSelected
+            ? 'selected'
+            : ''
+        }`;
 
 
-      const pinKey = `${cat.key}_${opt.id}`;
+      const pinKey =
+        `${cat.key}_${opt.id}`;
 
 
       const displayImg =
-        customPins[pinKey] || opt.img;
+        customPins[pinKey] ||
+        opt.img;
 
 
       let thumbHtml = '';
@@ -798,9 +877,16 @@
 
       chip.onclick = (e) => {
 
-        if(e.target.classList.contains('pin-btn')){
+        if(
+          e.target.classList.contains(
+            'pin-btn'
+          )
+        ){
+
           return;
+
         }
+
 
         selectOption(
           cat.key,
@@ -813,20 +899,26 @@
 
 
       const pinBtn =
-        chip.querySelector('.pin-btn');
+        chip.querySelector(
+          '.pin-btn'
+        );
 
 
       pinBtn.onclick = (e) => {
 
         e.stopPropagation();
 
+
         targetPinInfo = {
           catKey: cat.key,
           optId: opt.id
         };
 
+
         document
-          .getElementById('fileInputPin')
+          .getElementById(
+            'fileInputPin'
+          )
           .click();
 
       };
@@ -837,8 +929,10 @@
     });
 
 
-    /* 2. [그 외 (직접 업로드)] 칩 출력 */
-    const customChip = document.createElement('div');
+    /* 그 외 */
+
+    const customChip =
+      document.createElement('div');
 
 
     const isCustomSelected =
@@ -848,7 +942,9 @@
 
     customChip.className =
       `opt-chip custom ${
-        isCustomSelected ? 'selected' : ''
+        isCustomSelected
+          ? 'selected'
+          : ''
       }`;
 
 
@@ -859,7 +955,9 @@
     customChip.onclick = () => {
 
       document
-        .getElementById('fileInputCustom')
+        .getElementById(
+          'fileInputCustom'
+        )
         .click();
 
     };
@@ -875,6 +973,7 @@
   /* =========================================================
      옵션 선택
      ========================================================= */
+
   function selectOption(
     catKey,
     id,
@@ -890,11 +989,15 @@
 
 
     const photoEl =
-      document.getElementById(`photo-${catKey}`);
+      document.getElementById(
+        `photo-${catKey}`
+      );
 
 
     const captionEl =
-      document.getElementById(`caption-${catKey}`);
+      document.getElementById(
+        `caption-${catKey}`
+      );
 
 
     if(imgSrc){
@@ -910,8 +1013,6 @@
     }
     else{
 
-      /* 이미지가 없는 옵션을 선택한 경우에도
-         기본 이미지를 보여줌 */
       photoEl.innerHTML =
         getDefaultImageHTML();
 
@@ -920,9 +1021,12 @@
 
     if(label){
 
-      captionEl.textContent = label;
+      captionEl.textContent =
+        label;
 
-      captionEl.classList.remove('placeholder');
+      captionEl.classList.remove(
+        'placeholder'
+      );
 
     }
 
@@ -933,26 +1037,36 @@
 
 
   /* =========================================================
-     파일 업로드 - 그 외
+     직접 업로드
      ========================================================= */
+
   document
-    .getElementById('fileInputCustom')
+    .getElementById(
+      'fileInputCustom'
+    )
     .onchange = function(e){
 
-      const file = e.target.files[0];
+      const file =
+        e.target.files[0];
+
 
       if(!file){
+
         return;
+
       }
 
 
-      const reader = new FileReader();
+      const reader =
+        new FileReader();
 
 
       reader.onload = function(evt){
 
         const cat =
-          CATEGORIES[currentCategoryIndex];
+          CATEGORIES[
+            currentCategoryIndex
+          ];
 
 
         selectOption(
@@ -973,21 +1087,31 @@
 
 
   /* =========================================================
-     파일 업로드 - 고정 사진
+     고정 사진 업로드
      ========================================================= */
+
   document
-    .getElementById('fileInputPin')
+    .getElementById(
+      'fileInputPin'
+    )
     .onchange = function(e){
 
-      const file = e.target.files[0];
+      const file =
+        e.target.files[0];
 
 
-      if(!file || !targetPinInfo){
+      if(
+        !file ||
+        !targetPinInfo
+      ){
+
         return;
+
       }
 
 
-      const reader = new FileReader();
+      const reader =
+        new FileReader();
 
 
       reader.onload = function(evt){
@@ -1001,12 +1125,15 @@
 
 
         const currentSel =
-          selections[targetPinInfo.catKey];
+          selections[
+            targetPinInfo.catKey
+          ];
 
 
         if(
           currentSel &&
-          currentSel.id === targetPinInfo.optId
+          currentSel.id ===
+            targetPinInfo.optId
         ){
 
           selectOption(
@@ -1041,29 +1168,35 @@
   /* =========================================================
      이미지 저장
      ========================================================= */
+
   document
-    .getElementById('saveBtn')
+    .getElementById(
+      'saveBtn'
+    )
     .onclick = function(){
 
       const captureEl =
-        document.getElementById('capture');
+        document.getElementById(
+          'capture'
+        );
 
 
-      html2canvas(captureEl, {
+      html2canvas(
+        captureEl,
+        {
+          scale:2,
 
-        scale:2,
+          useCORS:true,
 
-        useCORS:true,
+          allowTaint:false,
 
-        allowTaint:false,
+          backgroundColor:'#000',
 
-        backgroundColor:'#000',
+          imageTimeout:15000,
 
-        imageTimeout:15000,
-
-        logging:false
-
-      })
+          logging:false
+        }
+      )
       .then(canvas => {
 
         const link =
@@ -1075,7 +1208,9 @@
 
 
         link.href =
-          canvas.toDataURL('image/png');
+          canvas.toDataURL(
+            'image/png'
+          );
 
 
         link.click();
@@ -1101,8 +1236,11 @@
   /* =========================================================
      초기화
      ========================================================= */
+
   document
-    .getElementById('resetBtn')
+    .getElementById(
+      'resetBtn'
+    )
     .onclick = function(){
 
       if(
@@ -1110,7 +1248,9 @@
           '작성 내용을 초기화하시겠습니까?'
         )
       ){
+
         return;
+
       }
 
 
@@ -1131,8 +1271,8 @@
           );
 
 
-        /* 변경된 부분:
-           초기화했을 때도 기본 이미지로 복구 */
+        /* 초기화 시 기본 이미지로 복구 */
+
         photoEl.innerHTML =
           getDefaultImageHTML();
 
@@ -1148,6 +1288,7 @@
 
       renderOptions();
 
+
       showToast(
         '초기화되었습니다.'
       );
@@ -1158,6 +1299,7 @@
   /* =========================================================
      실행
      ========================================================= */
+
   initGrid();
 
   initTabs();
