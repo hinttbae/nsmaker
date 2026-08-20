@@ -69,9 +69,20 @@
     border:3px solid #000;
   }
 
+  /*
+     ★ 저장 이미지 상하 여백 균형 수정
+
+     위/아래 padding을 동일하게 설정하고
+     제목/닉네임의 line-height도 고정합니다.
+  */
+
   .capture-title{
-    padding:16px 10px 14px;
+    padding:18px 10px;
     text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
   }
 
   .chart-title{
@@ -79,13 +90,16 @@
     font-weight:900;
     color:#fff;
     outline:none;
+    line-height:1.2;
+    margin:0;
   }
 
   .chart-handle{
     font-size:12px;
     color:rgba(255,255,255,0.65);
     outline:none;
-    margin-top:2px;
+    margin-top:4px;
+    line-height:1.2;
   }
 
   [contenteditable]:focus{
@@ -108,7 +122,6 @@
     background:#fff;
     display:flex;
     flex-direction:column;
-    min-width:0;
   }
 
   .op-head{
@@ -125,10 +138,8 @@
 
   /* =========================================================
      사진 영역
-
-     화면에서는 object-fit:cover 사용
-     → 원본 비율 유지
-     → 넘치는 부분만 크롭
+     
+     원본 비율 유지 + 정사각형 크롭
      ========================================================= */
 
   .op-photo{
@@ -138,7 +149,6 @@
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    min-width:0;
   }
 
   .op-photo img{
@@ -147,12 +157,6 @@
     object-fit:cover;
     object-position:center center;
     display:block;
-
-    /*
-      브라우저가 이미지 사이에
-      미세한 렌더링 틈을 만드는 것을 방지
-    */
-    vertical-align:top;
   }
 
   .op-photo .empty-label{
@@ -349,11 +353,6 @@
 
   .action-btn:hover{
     opacity:0.85;
-  }
-
-  .action-btn:disabled{
-    cursor:wait;
-    opacity:0.65;
   }
 
 
@@ -568,16 +567,6 @@
 
   const DEFAULT_IMAGE =
     'https://i.imgur.com/XEwY6gC.png';
-
-
-  /* =========================================================
-     저장 화질 설정
-
-     3 = 고화질
-     기존 2보다 저장 이미지가 선명합니다.
-     ========================================================= */
-
-  const EXPORT_SCALE = 3;
 
 
   /* =========================================================
@@ -1439,7 +1428,7 @@
 
 
   /* =========================================================
-     이미지 로딩 대기
+     이미지 저장용 함수
      ========================================================= */
 
   function waitForImage(img){
@@ -1458,16 +1447,7 @@
       }
 
 
-      let finished = false;
-
-
       const done = () => {
-
-        if(finished){
-          return;
-        }
-
-        finished = true;
 
         img.removeEventListener(
           'load',
@@ -1496,57 +1476,25 @@
         {once:true}
       );
 
-
-      /*
-        혹시 외부 이미지가 아주 늦게 로딩될 경우
-        저장이 영원히 멈추지 않도록 안전장치
-      */
-
-      setTimeout(
-        done,
-        15000
-      );
-
     });
 
   }
 
 
-  /* =========================================================
-     원본 이미지를 정사각형으로 실제 크롭
-
-     ★ 핵심 수정 부분
-
-     기존:
-       원본
-        ↓
-       무조건 1200px
-        ↓
-       html2canvas가 다시 축소
-
-     수정:
-       원본
-        ↓
-       최종 캡처 크기에 맞는 픽셀 크기로 크롭
-        ↓
-       html2canvas
-        ↓
-       PNG
-
-     따라서 불필요한 다운샘플링을 크게 줄입니다.
-     ========================================================= */
-
   function makeCropCanvas(
     img,
-    cssWidth,
-    cssHeight
+    width,
+    height
   ){
 
     const sourceWidth =
-      img.naturalWidth;
+      img.naturalWidth ||
+      img.width;
+
 
     const sourceHeight =
-      img.naturalHeight;
+      img.naturalHeight ||
+      img.height;
 
 
     if(
@@ -1559,115 +1507,71 @@
     }
 
 
-    /*
-      화면의 실제 비율
+    const sourceRatio =
+      sourceWidth /
+      sourceHeight;
 
-      현재 표 사진은 1:1이지만
-      CSS 변경에 대비해서 실제 비율을 계산합니다.
-    */
 
     const targetRatio =
-      cssWidth / cssHeight;
-
-
-    const sourceRatio =
-      sourceWidth / sourceHeight;
+      width /
+      height;
 
 
     let cropWidth =
       sourceWidth;
 
+
     let cropHeight =
       sourceHeight;
+
 
     let sourceX = 0;
 
     let sourceY = 0;
 
 
-    /*
-      object-fit:cover와 동일한 방식으로
-      중앙 크롭합니다.
-    */
-
     if(
-      sourceRatio > targetRatio
+      sourceRatio >
+      targetRatio
     ){
 
       cropWidth =
-        Math.round(
-          sourceHeight *
-          targetRatio
-        );
+        sourceHeight *
+        targetRatio;
 
-      cropWidth =
-        Math.min(
-          cropWidth,
-          sourceWidth
-        );
 
       sourceX =
-        Math.floor(
-          (sourceWidth - cropWidth) / 2
-        );
+        (
+          sourceWidth -
+          cropWidth
+        ) / 2;
 
     }
     else if(
-      sourceRatio < targetRatio
+      sourceRatio <
+      targetRatio
     ){
 
       cropHeight =
-        Math.round(
-          sourceWidth /
-          targetRatio
-        );
+        sourceWidth /
+        targetRatio;
 
-      cropHeight =
-        Math.min(
-          cropHeight,
-          sourceHeight
-        );
 
       sourceY =
-        Math.floor(
-          (sourceHeight - cropHeight) / 2
-        );
+        (
+          sourceHeight -
+          cropHeight
+        ) / 2;
 
     }
 
 
     /*
-      최종 캡처 이미지에서
-      이 사진이 차지하는 실제 픽셀 수.
-
-      예:
-        화면에서 150px
-        EXPORT_SCALE = 3
-
-        → 450 x 450px
-
-      기존의 무조건 1200px보다
-      훨씬 합리적으로 원본을 사용합니다.
+      충분한 해상도의 캔버스 생성
     */
 
-    const outputWidth =
-      Math.max(
-        1,
-        Math.round(
-          cssWidth *
-          EXPORT_SCALE
-        )
-      );
-
-
-    const outputHeight =
-      Math.max(
-        1,
-        Math.round(
-          cssHeight *
-          EXPORT_SCALE
-        )
-      );
+    const outputSize =
+      1200;
 
 
     const canvas =
@@ -1677,18 +1581,16 @@
 
 
     canvas.width =
-      outputWidth;
+      outputSize;
+
 
     canvas.height =
-      outputHeight;
+      outputSize;
 
 
     const ctx =
       canvas.getContext(
-        '2d',
-        {
-          alpha:false
-        }
+        '2d'
       );
 
 
@@ -1699,45 +1601,13 @@
     }
 
 
-    /*
-      JPEG/PNG 원본의 가장자리에서
-      브라우저가 반투명 픽셀을 만드는 것을
-      최소화하기 위한 설정
-    */
-
     ctx.imageSmoothingEnabled =
       true;
+
 
     ctx.imageSmoothingQuality =
       'high';
 
-
-    /*
-      배경을 먼저 검정으로 채움.
-
-      이미지가 정확하게 꽉 차기 때문에
-      정상적인 경우 이 배경은 보이지 않습니다.
-    */
-
-    ctx.fillStyle =
-      '#000';
-
-    ctx.fillRect(
-      0,
-      0,
-      outputWidth,
-      outputHeight
-    );
-
-
-    /*
-      핵심:
-      fractional crop 좌표를 쓰지 않고
-      전부 정수 픽셀로 처리합니다.
-
-      이게 사진 가장자리의
-      미세한 흰색/밝은 선 문제를 줄여줍니다.
-    */
 
     ctx.drawImage(
 
@@ -1745,46 +1615,33 @@
 
       sourceX,
       sourceY,
-
       cropWidth,
       cropHeight,
 
       0,
       0,
-
-      outputWidth,
-      outputHeight
+      outputSize,
+      outputSize
 
     );
 
 
-    /*
-      html2canvas가 이 canvas를
-      일반 이미지처럼 처리할 수 있도록
-      CSS 크기는 화면과 동일하게 설정합니다.
-    */
-
     canvas.style.width =
       '100%';
+
 
     canvas.style.height =
       '100%';
 
+
     canvas.style.display =
       'block';
-
-    canvas.style.objectFit =
-      'cover';
 
 
     return canvas;
 
   }
 
-
-  /* =========================================================
-     다운로드용 이미지 임시 교체
-     ========================================================= */
 
   async function prepareCaptureImages(){
 
@@ -1819,29 +1676,21 @@
       }
 
 
-      /*
-        실제 화면상의 사진 크기를 가져옵니다.
-      */
-
       const rect =
         photoBox.getBoundingClientRect();
 
 
-      const cssWidth =
+      const width =
         Math.max(
           1,
-          Math.round(
-            rect.width
-          )
+          Math.round(rect.width)
         );
 
 
-      const cssHeight =
+      const height =
         Math.max(
           1,
-          Math.round(
-            rect.height
-          )
+          Math.round(rect.height)
         );
 
 
@@ -1854,8 +1703,8 @@
         cropCanvas =
           makeCropCanvas(
             img,
-            cssWidth,
-            cssHeight
+            width,
+            height
           );
 
       }
@@ -1912,12 +1761,6 @@
     }
 
 
-    /*
-      DOM 변경사항을 브라우저가
-      실제 레이아웃에 반영하도록
-      두 프레임 기다립니다.
-    */
-
     await new Promise(
       resolve => {
 
@@ -1947,11 +1790,8 @@
           ){
 
             item.parent.insertBefore(
-
               item.img,
-
               item.nextSibling
-
             );
 
           }
@@ -1989,10 +1829,6 @@
         );
 
 
-      /*
-        중복 클릭 방지
-      */
-
       if(
         saveBtn.dataset.saving ===
         'true'
@@ -2027,81 +1863,46 @@
           );
 
 
-        /* ---------------------------------------------------
-           1. 이미지 실제 크롭
-           --------------------------------------------------- */
+        /*
+          사진을 먼저 실제 크롭 캔버스로 교체
+        */
 
         restoreImages =
           await prepareCaptureImages();
 
 
-        /* ---------------------------------------------------
-           2. 고화질 캡처
-
-           기존:
-             scale:2
-
-           수정:
-             scale:3
-           --------------------------------------------------- */
+        /*
+          html2canvas 캡처
+        */
 
         const canvas =
           await html2canvas(
-
             captureEl,
-
             {
 
-              scale:
-                EXPORT_SCALE,
+              scale:2,
 
-              useCORS:
-                true,
+              useCORS:true,
 
-              allowTaint:
-                false,
+              allowTaint:false,
 
-              backgroundColor:
-                '#000',
+              backgroundColor:'#000',
 
-              imageTimeout:
-                15000,
+              imageTimeout:15000,
 
-              logging:
-                false,
-
-              /*
-                브라우저의 현재 화면 크기와
-                캡처 크기를 정확하게 맞춥니다.
-              */
-
-              width:
-                captureEl.scrollWidth,
-
-              height:
-                captureEl.scrollHeight,
-
-              /*
-                스크롤 위치와 관계없이
-                표 전체를 캡처
-              */
-
-              scrollX:
-                0,
-
-              scrollY:
-                0
+              logging:false
 
             }
-
           );
 
 
-        /* ---------------------------------------------------
-           3. 화면 원상복구
-           --------------------------------------------------- */
+        /*
+          화면 복구
+        */
 
-        if(restoreImages){
+        if(
+          restoreImages
+        ){
 
           restoreImages();
 
@@ -2111,20 +1912,18 @@
         }
 
 
-        /* ---------------------------------------------------
-           4. PNG 생성
-
-           PNG quality는 lossless이므로
-           1.0을 사용합니다.
-           --------------------------------------------------- */
+        /*
+          PNG 생성
+        */
 
         const blob =
           await new Promise(
-
-            (resolve, reject) => {
+            (
+              resolve,
+              reject
+            ) => {
 
               canvas.toBlob(
-
                 result => {
 
                   if(result){
@@ -2137,11 +1936,9 @@
                   else{
 
                     reject(
-
                       new Error(
                         'PNG 생성에 실패했습니다.'
                       )
-
                     );
 
                   }
@@ -2155,7 +1952,6 @@
               );
 
             }
-
           );
 
 
@@ -2163,36 +1959,28 @@
           '넨석_취향표.png';
 
 
-        /* ---------------------------------------------------
-           5. 모바일 공유
-           --------------------------------------------------- */
+        /*
+          모바일 공유
+        */
 
         if(
-
           typeof navigator !==
             'undefined' &&
-
           navigator.share &&
-
           typeof File !==
             'undefined'
-
         ){
 
           try{
 
             const file =
               new File(
-
                 [blob],
-
                 fileName,
-
                 {
                   type:
                     'image/png'
                 }
-
               );
 
 
@@ -2208,11 +1996,7 @@
 
                 canShareFiles =
                   navigator.canShare({
-
-                    files:[
-                      file
-                    ]
-
+                    files:[file]
                   });
 
               }
@@ -2232,9 +2016,7 @@
 
               await navigator.share({
 
-                files:[
-                  file
-                ],
+                files:[file],
 
                 title:
                   '넨석 취향표',
@@ -2260,12 +2042,9 @@
           ){
 
             if(
-
               shareError &&
-
               shareError.name ===
                 'AbortError'
-
             ){
 
               return;
@@ -2283,9 +2062,9 @@
         }
 
 
-        /* ---------------------------------------------------
-           6. 일반 다운로드
-           --------------------------------------------------- */
+        /*
+          Blob URL 다운로드
+        */
 
         const blobUrl =
           URL.createObjectURL(
@@ -2302,8 +2081,10 @@
         link.href =
           blobUrl;
 
+
         link.download =
           fileName;
+
 
         link.style.display =
           'none';
@@ -2337,7 +2118,6 @@
           '이미지 저장을 시작했습니다.'
         );
 
-
       }
       catch(err){
 
@@ -2346,11 +2126,6 @@
           err
         );
 
-
-        /*
-          오류가 나도
-          반드시 화면 복구
-        */
 
         if(
           restoreImages
