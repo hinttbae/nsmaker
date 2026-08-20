@@ -287,78 +287,179 @@
 (function(){
   // 순서: [최애 - 최애 떡밥 - 입덕 계기 - 릴스 - 코어 - 조합명 - 모에화 - 최애 포타]
   const CATEGORIES = [
-    {
-      key: 'choiae',
-      name: '최애',
-      options: [
-        { id: '1', label: '원빈', img: 'https://i.namu.wiki/i/dbmgPd-OUGISBLIKJQtQ3mM4uRCZe0FcoJfuvyZc9nyvvpXfRl3VOsl_VetPQwoM2EO_VkqOPajPMVAAneGGgPhnq4NgwB4mH5flkZAblZkkLusXbsSqK13Ee1k4OrCYnWFyUPPXXr4opO2wbjQo3Q.webp' },
-        { id: '2', label: '은석', img: 'https://i.namu.wiki/i/A6zwjww1B3UNeeycxea5T_-tHTndZjpAch9CTZ8RQwx7VZTT5WIwW9AiDISiWJCL34VcXHkKWGXiplijsI1u-s_svA1wwLzIE2mFUDeRV0YVpg23TVyuynY_YDF1Y1zDs0b-qfDmJ-n4gfMTWkdTjQ.webp' }
-      ]
-    },
-    {
-      key: 'ddeokbap',
-      name: '최애 떡밥',
-      options: [
-        { id: '1', label: '비게퍼 라방', img: null },
-        { id: '2', label: '스페셜커플상', img: null },
-        { id: '3', label: '원석발견', img: null },
-        { id: '4', label: '문제 생기면 너땜에?', img: null },
-        { id: '5', label: '아육대 손잡기', img: null },
-        { id: '6', label: '아육대 승부차기', img: null },
-        { id: '7', label: '김볶밥 요리사', img: null }
-      ]
-    },
-    {
-      key: 'ipdeok',
-      name: '입덕 계기',
-      options: []
-    },
-    {
-      key: 'reels',
-      name: '릴스',
-      options: [
-        { id: '1', label: 'Cooking with', img: null },
-        { id: '2', label: '보핍보핍', img: null },
-        { id: '3', label: 'muah', img: null },
-        { id: '4', label: 'look alike', img: null },
-        { id: '5', label: '소다팝', img: null },
-        { id: '6', label: '하나둘셋 touch ya', img: null },
-        { id: '7', label: 'all of you', img: null }
-      ]
-    },
-    {
-      key: 'core',
-      name: '코어',
-      options: [
-        { id: '1', label: '동거', img: null },
-        { id: '2', label: '형형동동', img: null },
-        { id: '3', label: '쌍방얼빠', img: null },
-        { id: '4', label: '캬옹캬옹', img: null },
-        { id: '5', label: '카피캣', img: null }
-      ]
-    },
-    {
-      key: 'pair',
-      name: '조합명',
-      options: [
-        { id: '1', label: '울산바위', img: null },
-        { id: '2', label: '석과비니', img: null },
-        { id: '3', label: '왕자님즈', img: null },
-        { id: '4', label: '모지리즈', img: null },
-        { id: '5', label: '고양이 형제', img: null }
-      ]
-    },
-    {
-      key: 'moehwa',
-      name: '모에화',
-      options: []
-    },
-    {
-      key: 'pota',
-      name: '최애 포타',
-      options: []
-    }
-  ];
+  {
+    key: 'choiae',
+    name: '최애',
+    options: [
+      {
+        id: '1',
+        label: '원빈',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-fdeeba47-15c7-40a9-9016-d912f1707d7f.webp'
+      },
+      {
+        id: '2',
+        label: '은석',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-27aea046-fb38-4673-89a5-5f3311a4214e.webp'
+      }
+    ]
+  },
+
+  {
+    key: 'ddeokbap',
+    name: '최애 떡밥',
+    options: [
+      {
+        id: '1',
+        label: '비게퍼 라방',
+        img: '여기에_비게퍼_라방_이미지_URL'
+      },
+      {
+        id: '2',
+        label: '스페셜커플상',
+        img: '여기에_스페셜커플상_이미지_URL'
+      },
+      {
+        id: '3',
+        label: '원석발견',
+        img: '여기에_원석발견_이미지_URL'
+      },
+      {
+        id: '4',
+        label: '아육대',
+        img: '여기에_아육대_이미지_URL'
+      },
+      {
+        id: '5',
+        label: '여름방학',
+        img: '여기에_여름방학_이미지_URL'
+      }
+    ]
+  },
+
+  {
+    key: 'ipdeok',
+    name: '입덕 계기',
+    options: []
+  },
+
+  {
+    key: 'reels',
+    name: '릴스',
+    options: [
+      {
+        id: '1',
+        label: 'Cooking with',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-e7b8c00a-9855-4172-86eb-6ca6672d07e3.jpg'
+      },
+      {
+        id: '2',
+        label: '보핍보핍',
+        img: '여기에_보핍보핍_이미지_URL'
+      },
+      {
+        id: '3',
+        label: 'all of you',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-03c82044-c283-4629-85e1-6bc0cd42ef0d.jpg'
+      },
+      {
+        id: '4',
+        label: 'look alike',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-3e7a8bfc-f8f3-442e-a347-3a4dbcf663ec.jpg'
+      },
+      {
+        id: '5',
+        label: '소다팝',
+        img: '여기에_소다팝_이미지_URL'
+      },
+      {
+        id: '6',
+        label: '닉주디',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-67889a96-3008-4c1e-add9-94861166e063.jpg'
+      }
+    ]
+  },
+
+  {
+    key: 'core',
+    name: '코어',
+    options: [
+      {
+        id: '1',
+        label: '동거',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-556faacd-be1a-4ce9-a30f-745e2a2ce974.jpg'
+      },
+      {
+        id: '2',
+        label: '형형동동',
+        img: '여기에_형형동동_이미지_URL'
+      },
+      {
+        id: '3',
+        label: '쌍방얼빠',
+        img: '여기에_쌍방얼빠_이미지_URL'
+      },
+      {
+        id: '4',
+        label: '캬옹캬옹',
+        img: '여기에_캬옹캬옹_이미지_URL'
+      },
+      {
+        id: '5',
+        label: '카피캣',
+        img: '여기에_카피캣_이미지_URL'
+      },
+      {
+        id: '6',
+        label: '애교 알러지',
+        img: '여기에_애교_알러지_이미지_URL'
+      }
+    ]
+  },
+
+  {
+    key: 'pair',
+    name: '조합명',
+    options: [
+      {
+        id: '1',
+        label: '울산바위',
+        img: '여기에_울산바위_이미지_URL'
+      },
+      {
+        id: '2',
+        label: '석과비니',
+        img: '여기에_석과비니_이미지_URL'
+      },
+      {
+        id: '3',
+        label: '왕자님즈',
+        img: '여기에_왕자님즈_이미지_URL'
+      },
+      {
+        id: '4',
+        label: '모지리즈',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-6749121a-616d-4057-acf5-c71874c14b74.jpg'
+      },
+      {
+        id: '5',
+        label: '고양이 형제',
+        img: 'https://cdn.phototourl.com/free/2026-08-20-a25c1759-831f-4e29-a9d4-a601d765cfb0.jpg'
+      }
+    ]
+  },
+
+  {
+    key: 'moehwa',
+    name: '모에화',
+    options: []
+  },
+
+  {
+    key: 'pota',
+    name: '최애 포타',
+    options: []
+  }
+];
 
   let currentCategoryIndex = 0;
   const selections = {}; 
