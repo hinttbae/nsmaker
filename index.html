@@ -276,10 +276,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-(function(){
-  // 카테고리 설정
+document.addEventListener("DOMContentLoaded", function() {
+  // 카테고리 목록 (필요시 options 배열 안에 { id: '1', label: '원빈', img: '이미지주소' } 형태로 추가하시면 됩니다)
   const CATEGORIES = [
-    { key: 'choiae', name: '최애', options: [{ id: '1', label: '원빈', img: '' }] },
+    { key: 'choiae', name: '최애', options: [] },
     { key: 'tteokbab', name: '최애 떡밥', options: [] },
     { key: 'ipdeok', name: '입덕 계기', options: [] },
     { key: 'reels', name: '릴스', options: [] },
@@ -289,7 +289,6 @@
     { key: 'pota', name: '최애 포타', options: [] }
   ];
 
-  // 각 카테고리별 현재 선택 상태 저장
   const state = {};
   CATEGORIES.forEach(cat => {
     state[cat.key] = { selectedOption: null, customImg: null, customLabel: '' };
@@ -297,7 +296,6 @@
 
   let currentTabKey = CATEGORIES[0].key;
 
-  // DOM 요소를 가져옵니다.
   const opGrid = document.getElementById('opGrid');
   const tabs = document.getElementById('tabs');
   const optionsBody = document.getElementById('optionsBody');
@@ -306,74 +304,74 @@
   const resetBtn = document.getElementById('resetBtn');
   const toast = document.getElementById('toast');
 
-  // 토스트 메시지 출력
   function showToast(msg) {
+    if (!toast) return;
     toast.textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
-  // 1. Grid (표) 초기화 및 렌더링
+  // 1. 그리드 렌더링
   function renderGrid() {
+    if (!opGrid) return;
     opGrid.innerHTML = '';
     CATEGORIES.forEach(cat => {
       const catState = state[cat.key];
       const cell = document.createElement('div');
       cell.className = 'op-cell';
 
-      // 이미지 영역 구하기
       let imgHtml = '<div class="empty-label">선택 안 함</div>';
       let labelText = '';
 
       if (catState.selectedOption === 'custom') {
         if (catState.customImg) {
-          imgHtml = `<img src="${catState.customImg}" alt="custom">`;
+          imgHtml = '<img src="' + catState.customImg + '" alt="custom">';
         } else {
           imgHtml = '<div class="empty-label">이미지 업로드</div>';
         }
-        labelText = catState.customLabel;
+        labelText = catState.customLabel || '';
       } else if (catState.selectedOption) {
         const opt = cat.options.find(o => o.id === catState.selectedOption);
         if (opt) {
-          imgHtml = opt.img ? `<img src="${opt.img}" alt="${opt.label}">` : `<div class="empty-label">${opt.label}</div>`;
+          imgHtml = opt.img ? '<img src="' + opt.img + '" alt="' + opt.label + '">' : '<div class="empty-label">' + opt.label + '</div>';
           labelText = opt.label;
         }
       }
 
-      cell.innerHTML = `
-        <div class="op-head">${cat.name}</div>
-        <div class="op-photo">${imgHtml}</div>
-        <div class="op-caption" contenteditable="true" spellcheck="false" data-placeholder="직접 입력">${labelText}</div>
-      `;
+      cell.innerHTML = 
+        '<div class="op-head">' + cat.name + '</div>' +
+        '<div class="op-photo">' + imgHtml + '</div>' +
+        '<div class="op-caption" contenteditable="true" spellcheck="false" data-placeholder="직접 입력">' + labelText + '</div>';
 
-      // 캡션 직접 수정 시 state 반영
       const captionEl = cell.querySelector('.op-caption');
-      captionEl.addEventListener('input', (e) => {
-        if (catState.selectedOption === 'custom') {
-          catState.customLabel = e.target.innerText;
-        }
-      });
+      if (captionEl) {
+        captionEl.addEventListener('input', function(e) {
+          if (catState.selectedOption === 'custom') {
+            catState.customLabel = e.target.innerText;
+          }
+        });
+      }
 
       opGrid.appendChild(cell);
     });
   }
 
-  // 2. 컨트롤 패널 (탭 및 옵션 칩) 렌더링
+  // 2. 컨트롤 패널 렌더링
   function renderPanel() {
-    // 탭 생성
+    if (!tabs || !optionsBody) return;
+    
     tabs.innerHTML = '';
     CATEGORIES.forEach(cat => {
       const btn = document.createElement('button');
-      btn.className = `tab-btn ${cat.key === currentTabKey ? 'active' : ''}`;
+      btn.className = 'tab-btn' + (cat.key === currentTabKey ? ' active' : '');
       btn.textContent = cat.name;
-      btn.onclick = () => {
+      btn.onclick = function() {
         currentTabKey = cat.key;
         renderPanel();
       };
       tabs.appendChild(btn);
     });
 
-    // 옵션 칩 생성
     optionsBody.innerHTML = '';
     const activeCat = CATEGORIES.find(c => c.key === currentTabKey);
     const catState = state[currentTabKey];
@@ -381,87 +379,100 @@
     const row = document.createElement('div');
     row.className = 'options-row';
 
-    // 기본 옵션 칩들
-    activeCat.options.forEach(opt => {
-      const chip = document.createElement('div');
-      chip.className = `opt-chip ${catState.selectedOption === opt.id ? 'selected' : ''}`;
-      
-      const thumb = opt.img ? `<img src="${opt.img}">` : '<span>-</span>';
-      chip.innerHTML = `<div class="mini-thumb">${thumb}</div><span>${opt.label}</span>`;
-      
-      chip.onclick = () => {
-        catState.selectedOption = (catState.selectedOption === opt.id) ? null : opt.id;
-        renderGrid();
-        renderPanel();
-      };
-      row.appendChild(chip);
-    });
+    if (activeCat && activeCat.options) {
+      activeCat.options.forEach(opt => {
+        const chip = document.createElement('div');
+        chip.className = 'opt-chip' + (catState.selectedOption === opt.id ? ' selected' : '');
+        
+        const thumb = opt.img ? '<img src="' + opt.img + '">' : '<span>-</span>';
+        chip.innerHTML = '<div class="mini-thumb">' + thumb + '</div><span>' + opt.label + '</span>';
+        
+        chip.onclick = function() {
+          catState.selectedOption = (catState.selectedOption === opt.id) ? null : opt.id;
+          renderGrid();
+          renderPanel();
+        };
+        row.appendChild(chip);
+      });
+    }
 
-    // [그 외] 커스텀 칩
+    // [그 외] 버튼
     const customChip = document.createElement('div');
-    customChip.className = `opt-chip custom ${catState.selectedOption === 'custom' ? 'selected' : ''}`;
-    const customThumb = catState.customImg ? `<img src="${catState.customImg}">` : '<span>+</span>';
-    customChip.innerHTML = `<div class="mini-thumb">${customThumb}</div><span>[그 외]</span>`;
+    customChip.className = 'opt-chip custom' + (catState.selectedOption === 'custom' ? ' selected' : '');
+    const customThumb = catState.customImg ? '<img src="' + catState.customImg + '">' : '<span>+</span>';
+    customChip.innerHTML = '<div class="mini-thumb">' + customThumb + '</div><span>[그 외]</span>';
     
-    customChip.onclick = () => {
+    customChip.onclick = function() {
       catState.selectedOption = 'custom';
-      fileInputCustom.click(); // 파일 선택창 열기
+      if (fileInputCustom) fileInputCustom.click();
     };
     row.appendChild(customChip);
 
     optionsBody.appendChild(row);
   }
 
-  // 파일 업로드 처리
-  fileInputCustom.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // 커스텀 이미지 파일 업로드
+  if (fileInputCustom) {
+    fileInputCustom.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      state[currentTabKey].customImg = event.target.result;
-      renderGrid();
-      renderPanel();
-      fileInputCustom.value = ''; // 초기화
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // 이미지 저장 기능 (html2canvas 사용)
-  saveBtn.addEventListener('click', () => {
-    showToast('이미지 생성 중입니다...');
-    const captureEl = document.getElementById('capture');
-
-    html2canvas(captureEl, {
-      scale: 2, // 고화질 저장
-      useCORS: true
-    }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = '취향표.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('이미지가 저장되었습니다!');
-    }).catch(() => {
-      showToast('저장 중 오류가 발생했습니다.');
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        state[currentTabKey].customImg = event.target.result;
+        renderGrid();
+        renderPanel();
+        fileInputCustom.value = '';
+      };
+      reader.readAsDataURL(file);
     });
-  });
+  }
 
-  // 초기화 버튼
-  resetBtn.addEventListener('click', () => {
-    if (confirm('모든 선택 내역을 초기화하시겠습니까?')) {
-      CATEGORIES.forEach(cat => {
-        state[cat.key] = { selectedOption: null, customImg: null, customLabel: '' };
+  // 이미지 저장 (html2canvas)
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+      showToast('이미지 생성 중입니다...');
+      const captureEl = document.getElementById('capture');
+
+      if (typeof html2canvas === 'undefined') {
+        showToast('저장 라이브러리를 불러오지 못했습니다.');
+        return;
+      }
+
+      html2canvas(captureEl, {
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = '취향표.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('이미지가 저장되었습니다!');
+      }).catch(err => {
+        console.error(err);
+        showToast('저장 중 오류가 발생했습니다.');
       });
-      renderGrid();
-      renderPanel();
-      showToast('초기화되었습니다.');
-    }
-  });
+    });
+  }
 
-  // 최초 앱 시작
+  // 초기화
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      if (confirm('모든 선택 내역을 초기화하시겠습니까?')) {
+        CATEGORIES.forEach(cat => {
+          state[cat.key] = { selectedOption: null, customImg: null, customLabel: '' };
+        });
+        renderGrid();
+        renderPanel();
+        showToast('초기화되었습니다.');
+      }
+    });
+  }
+
+  // 초기 실행
   renderGrid();
   renderPanel();
-})();
+});
 </script>
 </body>
 </html>
