@@ -1,8 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>넨석 취향표 만들기</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,15 +12,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
+
   :root{
     --line:#c9c9c9;
     --ink:#000;
     --muted:#888;
   }
 
-  *{box-sizing:border-box;}
+  *{
+    box-sizing:border-box;
+  }
 
-  html,body{
+  html,
+  body{
     margin:0;
     padding:0;
   }
@@ -54,7 +60,11 @@
     font-size:13px;
   }
 
-  /* ===== 표(캡처 영역) ===== */
+
+  /* =========================================================
+     표
+     ========================================================= */
+
   #capture{
     background:#000;
     border:3px solid #000;
@@ -83,7 +93,9 @@
     background:rgba(255,255,255,0.12);
   }
 
-  /* 4x2 그리드 배열 설정 */
+
+  /* 4 x 2 그리드 */
+
   .op-grid{
     display:grid;
     grid-template-columns:repeat(4, 1fr);
@@ -108,6 +120,14 @@
     word-break:keep-all;
   }
 
+
+  /* =========================================================
+     사진 영역
+
+     사진의 원본 비율은 유지하고,
+     정사각형 칸에 맞춰 크롭합니다.
+     ========================================================= */
+
   .op-photo{
     aspect-ratio:1/1;
     background:#e9e9e9;
@@ -117,19 +137,16 @@
     overflow:hidden;
   }
 
-  /*
-    사진 비율 유지 + 칸에 맞춰 크롭
-
-    cover:
-    - 사진 원본 비율을 절대 변형하지 않음
-    - 정사각형 칸을 꽉 채움
-    - 칸보다 넘치는 부분만 잘라냄
-  */
   .op-photo img{
     width:100%;
     height:100%;
+
+    /* 사진 비율 유지 + 넘치는 부분 크롭 */
     object-fit:cover;
+
+    /* 사진 중앙을 기준으로 크롭 */
     object-position:center center;
+
     display:block;
   }
 
@@ -138,6 +155,11 @@
     color:#aaa;
     text-align:center;
   }
+
+
+  /* =========================================================
+     캡션
+     ========================================================= */
 
   .op-caption[contenteditable]{
     outline:none;
@@ -166,14 +188,17 @@
     font-weight:400;
   }
 
-  /* ===== 컨트롤 패널 ===== */
+
+  /* =========================================================
+     컨트롤 패널
+     ========================================================= */
+
   .panel{
     margin-top:18px;
     border:1px solid var(--line);
     background:#fff;
   }
 
-  /* 탭 항목 선택 창 4x2 그리드 적용 */
   .tabs{
     display:grid;
     grid-template-columns:repeat(4, 1fr);
@@ -222,6 +247,11 @@
     gap:8px;
   }
 
+
+  /* =========================================================
+     옵션 칩
+     ========================================================= */
+
   .opt-chip{
     position:relative;
     display:flex;
@@ -257,8 +287,11 @@
   .opt-chip .mini-thumb img{
     width:100%;
     height:100%;
+
+    /* 썸네일도 원본 비율 유지 + 크롭 */
     object-fit:cover;
     object-position:center center;
+
     display:block;
   }
 
@@ -279,6 +312,11 @@
   .opt-chip.custom{
     border-style:dashed;
   }
+
+
+  /* =========================================================
+     버튼
+     ========================================================= */
 
   .actions{
     display:flex;
@@ -311,6 +349,11 @@
     opacity:0.85;
   }
 
+
+  /* =========================================================
+     안내 문구
+     ========================================================= */
+
   .hint{
     margin-top:14px;
     font-size:12px;
@@ -319,6 +362,11 @@
     border-top:1px dashed var(--line);
     padding-top:12px;
   }
+
+
+  /* =========================================================
+     토스트
+     ========================================================= */
 
   .toast{
     position:fixed;
@@ -332,6 +380,9 @@
     opacity:0;
     pointer-events:none;
     transition:all .2s ease;
+    z-index:9999;
+    max-width:90%;
+    text-align:center;
   }
 
   .toast.show{
@@ -339,7 +390,13 @@
     transform:translateX(-50%) translateY(0);
   }
 
+
+  /* =========================================================
+     모바일
+     ========================================================= */
+
   @media (max-width:480px){
+
     .op-head{
       font-size:10px;
       padding:5px 1px;
@@ -353,255 +410,397 @@
       font-size:11px;
       padding:8px 1px;
     }
+
+    .actions{
+      flex-direction:row;
+    }
+
+    .action-btn{
+      padding:10px 16px;
+    }
+
   }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="page">
 
   <header>
+
     <h1>❤️넨석 취향표 만들기❤️</h1>
-    <p>항목별 보기를 선택해 표를 완성하고, 이미지로 저장해보세요.</p>
+
+    <p>
+      항목별 보기를 선택해 표를 완성하고,
+      이미지로 저장해보세요.
+    </p>
+
   </header>
+
+
+  <!-- =======================================================
+       캡처 영역
+       ======================================================= -->
 
   <div id="capture">
 
     <div class="capture-title">
-      <div class="chart-title" contenteditable="true" spellcheck="false">❤️넨석 취향표❤️</div>
-      <div class="chart-handle" contenteditable="true" spellcheck="false">@닉네임</div>
+
+      <div
+        class="chart-title"
+        contenteditable="true"
+        spellcheck="false"
+      >❤️넨석 취향표❤️</div>
+
+      <div
+        class="chart-handle"
+        contenteditable="true"
+        spellcheck="false"
+      >@닉네임</div>
+
     </div>
 
-    <div class="op-grid" id="opGrid"></div>
+
+    <div
+      class="op-grid"
+      id="opGrid"
+    ></div>
 
   </div>
+
+
+  <!-- =======================================================
+       컨트롤 패널
+       ======================================================= -->
 
   <div class="panel">
-    <div class="tabs" id="tabs"></div>
-    <div class="options-body" id="optionsBody"></div>
+
+    <div
+      class="tabs"
+      id="tabs"
+    ></div>
+
+    <div
+      class="options-body"
+      id="optionsBody"
+    ></div>
+
   </div>
 
-  <input type="file" id="fileInputCustom" accept="image/*" style="display:none">
-  <input type="file" id="fileInputPin" accept="image/*" style="display:none">
+
+  <!-- 파일 업로드 -->
+
+  <input
+    type="file"
+    id="fileInputCustom"
+    accept="image/*"
+    style="display:none"
+  >
+
+  <input
+    type="file"
+    id="fileInputPin"
+    accept="image/*"
+    style="display:none"
+  >
+
+
+  <!-- 버튼 -->
 
   <div class="actions">
-    <button class="action-btn primary" id="saveBtn">이미지로 저장</button>
-    <button class="action-btn ghost" id="resetBtn">초기화</button>
+
+    <button
+      class="action-btn primary"
+      id="saveBtn"
+    >
+      이미지로 저장
+    </button>
+
+    <button
+      class="action-btn ghost"
+      id="resetBtn"
+    >
+      초기화
+    </button>
+
   </div>
 
+
   <div class="hint">
-    📌 오류 및 수정 문의는 spin-spin.com/kkamgotheleft 로 보내주세요.<br>
-    📌 보기에 없는 답을 쓰고 싶다면 각 항목의 [그 외] 칩을 눌러 직접 사진을 올리면 됩니다.
+
+    📌 오류 및 수정 문의는
+    spin-spin.com/kkamgotheleft 로 보내주세요.<br>
+
+    📌 보기에 없는 답을 쓰고 싶다면
+    각 항목의 [그 외] 칩을 눌러 직접 사진을 올리면 됩니다.
+
   </div>
 
 </div>
 
-<div class="toast" id="toast"></div>
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 
 <script>
 (function(){
 
+
   /* =========================================================
      기본 이미지
      ========================================================= */
-  const DEFAULT_IMAGE = 'https://i.imgur.com/XEwY6gC.png';
+
+  const DEFAULT_IMAGE =
+    'https://i.imgur.com/XEwY6gC.png';
 
 
   /* =========================================================
-     카테고리 및 옵션
+     카테고리
      ========================================================= */
 
   const CATEGORIES = [
 
     {
-      key: 'choiae',
-      name: '최애',
-      options: [
+      key:'choiae',
+      name:'최애',
+
+      options:[
+
         {
-          id: '1',
-          label: '원빈',
-          img: 'https://i.imgur.com/fvkBgdC.jpeg'
+          id:'1',
+          label:'원빈',
+          img:'https://i.imgur.com/fvkBgdC.jpeg'
         },
+
         {
-          id: '2',
-          label: '은석',
-          img: 'https://i.imgur.com/dlVur67.jpeg'
+          id:'2',
+          label:'은석',
+          img:'https://i.imgur.com/dlVur67.jpeg'
         }
+
       ]
     },
 
+
     {
-      key: 'ddeokbap',
-      name: '최애 떡밥',
-      options: [
+      key:'ddeokbap',
+      name:'최애 떡밥',
+
+      options:[
+
         {
-          id: '1',
-          label: '비게퍼',
-          img: 'https://i.imgur.com/I4RXCjq.jpeg'
+          id:'1',
+          label:'비게퍼',
+          img:'https://i.imgur.com/I4RXCjq.jpeg'
         },
+
         {
-          id: '2',
-          label: '스페셜커플',
-          img: 'https://i.imgur.com/ElUNqI0.jpeg'
+          id:'2',
+          label:'스페셜커플',
+          img:'https://i.imgur.com/ElUNqI0.jpeg'
         },
+
         {
-          id: '3',
-          label: '원석발견',
-          img: 'https://i.imgur.com/jERGkpu.jpeg'
+          id:'3',
+          label:'원석발견',
+          img:'https://i.imgur.com/jERGkpu.jpeg'
         },
+
         {
-          id: '4',
-          label: '아육대',
-          img: 'https://i.imgur.com/YyQXJVs.jpeg'
+          id:'4',
+          label:'아육대',
+          img:'https://i.imgur.com/YyQXJVs.jpeg'
         },
+
         {
-          id: '5',
-          label: '여름방학',
-          img: 'https://i.imgur.com/vhZ460J.jpeg'
+          id:'5',
+          label:'여름방학',
+          img:'https://i.imgur.com/vhZ460J.jpeg'
         }
+
       ]
     },
 
-    {
-      key: 'ipdeok',
-      name: '입덕 계기',
-      options: []
-    },
 
     {
-      key: 'reels',
-      name: '릴스',
-      options: [
+      key:'ipdeok',
+      name:'입덕 계기',
+      options:[]
+    },
+
+
+    {
+      key:'reels',
+      name:'릴스',
+
+      options:[
+
         {
-          id: '1',
-          label: 'Cooking with',
-          img: 'https://i.imgur.com/0DmTYa5.jpeg'
+          id:'1',
+          label:'Cooking with',
+          img:'https://i.imgur.com/0DmTYa5.jpeg'
         },
+
         {
-          id: '2',
-          label: '보핍보핍',
-          img: 'https://i.imgur.com/mVwKXnh.jpeg'
+          id:'2',
+          label:'보핍보핍',
+          img:'https://i.imgur.com/mVwKXnh.jpeg'
         },
+
         {
-          id: '3',
-          label: 'all of you',
-          img: 'https://i.imgur.com/H6vxVMd.jpeg'
+          id:'3',
+          label:'all of you',
+          img:'https://i.imgur.com/H6vxVMd.jpeg'
         },
+
         {
-          id: '4',
-          label: 'look alike',
-          img: 'https://i.imgur.com/pSAAItT.jpeg'
+          id:'4',
+          label:'look alike',
+          img:'https://i.imgur.com/pSAAItT.jpeg'
         },
+
         {
-          id: '5',
-          label: '소다팝',
-          img: 'https://i.imgur.com/7f4nNbN.jpeg'
+          id:'5',
+          label:'소다팝',
+          img:'https://i.imgur.com/7f4nNbN.jpeg'
         },
+
         {
-          id: '6',
-          label: '닉주디',
-          img: 'https://i.imgur.com/Jhw7pxl.jpeg'
+          id:'6',
+          label:'닉주디',
+          img:'https://i.imgur.com/Jhw7pxl.jpeg'
         }
+
       ]
     },
 
+
     {
-      key: 'core',
-      name: '코어',
-      options: [
+      key:'core',
+      name:'코어',
+
+      options:[
+
         {
-          id: '1',
-          label: '동거',
-          img: 'https://i.imgur.com/J81AhAc.jpeg'
+          id:'1',
+          label:'동거',
+          img:'https://i.imgur.com/J81AhAc.jpeg'
         },
+
         {
-          id: '2',
-          label: '형형동동',
-          img: 'https://i.imgur.com/OBXFO8M.jpeg'
+          id:'2',
+          label:'형형동동',
+          img:'https://i.imgur.com/OBXFO8M.jpeg'
         },
+
         {
-          id: '3',
-          label: '쌍방얼빠',
-          img: 'https://i.imgur.com/AAgX0l1.jpeg'
+          id:'3',
+          label:'쌍방얼빠',
+          img:'https://i.imgur.com/AAgX0l1.jpeg'
         },
+
         {
-          id: '4',
-          label: '캬옹캬옹',
-          img: 'https://i.imgur.com/lM0w4Ou.jpeg'
+          id:'4',
+          label:'캬옹캬옹',
+          img:'https://i.imgur.com/lM0w4Ou.jpeg'
         },
+
         {
-          id: '5',
-          label: '카피캣',
-          img: 'https://i.imgur.com/kDSi3O4.jpeg'
+          id:'5',
+          label:'카피캣',
+          img:'https://i.imgur.com/kDSi3O4.jpeg'
         },
+
         {
-          id: '6',
-          label: '애교 알러지',
-          img: 'https://i.imgur.com/RgtU7UA.png'
+          id:'6',
+          label:'애교 알러지',
+          img:'https://i.imgur.com/RgtU7UA.png'
         }
+
       ]
     },
 
+
     {
-      key: 'pair',
-      name: '조합명',
-      options: [
+      key:'pair',
+      name:'조합명',
+
+      options:[
+
         {
-          id: '1',
-          label: '울산바위',
-          img: 'https://i.imgur.com/Wt8UFpL.jpeg'
+          id:'1',
+          label:'울산바위',
+          img:'https://i.imgur.com/Wt8UFpL.jpeg'
         },
+
         {
-          id: '2',
-          label: '석과비니',
-          img: 'https://i.imgur.com/DmQKMRM.jpeg'
+          id:'2',
+          label:'석과비니',
+          img:'https://i.imgur.com/DmQKMRM.jpeg'
         },
+
         {
-          id: '3',
-          label: '왕자님즈',
-          img: 'https://i.imgur.com/wdgf2a8.jpeg'
+          id:'3',
+          label:'왕자님즈',
+          img:'https://i.imgur.com/wdgf2a8.jpeg'
         },
+
         {
-          id: '4',
-          label: '모지리즈',
-          img: 'https://i.imgur.com/5dqOQwK.jpeg'
+          id:'4',
+          label:'모지리즈',
+          img:'https://i.imgur.com/5dqOQwK.jpeg'
         },
+
         {
-          id: '5',
-          label: '고양이 형제',
-          img: 'https://i.imgur.com/ElxrbZk.jpeg'
+          id:'5',
+          label:'고양이 형제',
+          img:'https://i.imgur.com/ElxrbZk.jpeg'
         }
+
       ]
     },
 
-    {
-      key: 'moehwa',
-      name: '모에화',
-      options: []
-    },
 
     {
-      key: 'pota',
-      name: '최애 포타',
-      options: []
+      key:'moehwa',
+      name:'모에화',
+      options:[]
+    },
+
+
+    {
+      key:'pota',
+      name:'최애 포타',
+      options:[]
     }
 
   ];
 
 
+  /* =========================================================
+     상태
+     ========================================================= */
+
   let currentCategoryIndex = 0;
 
   const selections = {};
+
   const customPins = {};
 
   let targetPinInfo = null;
 
 
   /* =========================================================
-     기본 이미지 표시
+     기본 이미지 HTML
      ========================================================= */
 
   function getDefaultImageHTML(){
@@ -630,17 +829,18 @@
 
     t.classList.add('show');
 
+
     setTimeout(() => {
 
       t.classList.remove('show');
 
-    }, 2000);
+    }, 2500);
 
   }
 
 
   /* =========================================================
-     그리드 초기화
+     그리드 생성
      ========================================================= */
 
   function initGrid(){
@@ -674,7 +874,8 @@
 
       photo.className = 'op-photo';
 
-      photo.id = `photo-${cat.key}`;
+      photo.id =
+        `photo-${cat.key}`;
 
 
       /* 기본 이미지 */
@@ -719,7 +920,7 @@
 
 
   /* =========================================================
-     탭 초기화
+     탭 생성
      ========================================================= */
 
   function initTabs(){
@@ -730,35 +931,39 @@
     tabsContainer.innerHTML = '';
 
 
-    CATEGORIES.forEach((cat, idx) => {
+    CATEGORIES.forEach(
+      (cat, idx) => {
 
-      const btn =
-        document.createElement('button');
+        const btn =
+          document.createElement('button');
 
-      btn.className =
-        `tab-btn ${
-          idx === currentCategoryIndex
-            ? 'active'
-            : ''
-        }`;
+        btn.className =
+          `tab-btn ${
+            idx === currentCategoryIndex
+              ? 'active'
+              : ''
+          }`;
 
-      btn.textContent = cat.name;
-
-
-      btn.onclick = () => {
-
-        currentCategoryIndex = idx;
-
-        renderTabs();
-
-        renderOptions();
-
-      };
+        btn.textContent =
+          cat.name;
 
 
-      tabsContainer.appendChild(btn);
+        btn.onclick = () => {
 
-    });
+          currentCategoryIndex =
+            idx;
+
+          renderTabs();
+
+          renderOptions();
+
+        };
+
+
+        tabsContainer.appendChild(btn);
+
+      }
+    );
 
   }
 
@@ -775,20 +980,29 @@
       );
 
 
-    btns.forEach((btn, idx) => {
+    btns.forEach(
+      (btn, idx) => {
 
-      if(idx === currentCategoryIndex){
+        if(
+          idx ===
+          currentCategoryIndex
+        ){
 
-        btn.classList.add('active');
+          btn.classList.add(
+            'active'
+          );
+
+        }
+        else{
+
+          btn.classList.remove(
+            'active'
+          );
+
+        }
 
       }
-      else{
-
-        btn.classList.remove('active');
-
-      }
-
-    });
+    );
 
   }
 
@@ -808,7 +1022,9 @@
 
 
     const cat =
-      CATEGORIES[currentCategoryIndex];
+      CATEGORIES[
+        currentCategoryIndex
+      ];
 
 
     const row =
@@ -818,118 +1034,140 @@
       'options-row';
 
 
-    /* 프리셋 */
+    /* -------------------------------------------------------
+       기본 옵션
+       ------------------------------------------------------- */
 
-    cat.options.forEach(opt => {
+    cat.options.forEach(
+      opt => {
 
-      const chip =
-        document.createElement('div');
-
-
-      const isSelected =
-        selections[cat.key] &&
-        selections[cat.key].id === opt.id;
+        const chip =
+          document.createElement('div');
 
 
-      chip.className =
-        `opt-chip ${
-          isSelected
-            ? 'selected'
-            : ''
-        }`;
+        const isSelected =
+          selections[cat.key] &&
+          selections[cat.key].id ===
+            opt.id;
 
 
-      const pinKey =
-        `${cat.key}_${opt.id}`;
+        chip.className =
+          `opt-chip ${
+            isSelected
+              ? 'selected'
+              : ''
+          }`;
 
 
-      const displayImg =
-        customPins[pinKey] ||
-        opt.img;
+        const pinKey =
+          `${cat.key}_${opt.id}`;
 
 
-      let thumbHtml = '';
+        const displayImg =
+          customPins[pinKey] ||
+          opt.img;
 
 
-      if(displayImg){
-
-        thumbHtml = `
-          <div class="mini-thumb">
-            <img
-              src="${displayImg}"
-              crossorigin="anonymous"
-            >
-          </div>
-        `;
-
-      }
+        let thumbHtml = '';
 
 
-      chip.innerHTML = `
-        ${thumbHtml}
-        <span>${opt.label}</span>
-        <button
-          class="pin-btn"
-          title="고정 사진 설정"
-        >📷</button>
-      `;
+        if(displayImg){
 
+          thumbHtml = `
+            <div class="mini-thumb">
 
-      chip.onclick = (e) => {
+              <img
+                src="${displayImg}"
+                crossorigin="anonymous"
+              >
 
-        if(
-          e.target.classList.contains(
-            'pin-btn'
-          )
-        ){
-
-          return;
+            </div>
+          `;
 
         }
 
 
-        selectOption(
-          cat.key,
-          opt.id,
-          opt.label,
-          displayImg
-        );
+        chip.innerHTML = `
 
-      };
+          ${thumbHtml}
 
+          <span>
+            ${opt.label}
+          </span>
 
-      const pinBtn =
-        chip.querySelector(
-          '.pin-btn'
-        );
+          <button
+            class="pin-btn"
+            title="고정 사진 설정"
+          >
+            📷
+          </button>
 
-
-      pinBtn.onclick = (e) => {
-
-        e.stopPropagation();
+        `;
 
 
-        targetPinInfo = {
-          catKey: cat.key,
-          optId: opt.id
+        chip.onclick = (e) => {
+
+          if(
+            e.target.classList.contains(
+              'pin-btn'
+            )
+          ){
+
+            return;
+
+          }
+
+
+          selectOption(
+            cat.key,
+            opt.id,
+            opt.label,
+            displayImg
+          );
+
         };
 
 
-        document
-          .getElementById(
-            'fileInputPin'
-          )
-          .click();
-
-      };
+        const pinBtn =
+          chip.querySelector(
+            '.pin-btn'
+          );
 
 
-      row.appendChild(chip);
+        pinBtn.onclick = (e) => {
 
-    });
+          e.stopPropagation();
 
 
-    /* 그 외 */
+          targetPinInfo = {
+
+            catKey:
+              cat.key,
+
+            optId:
+              opt.id
+
+          };
+
+
+          document
+            .getElementById(
+              'fileInputPin'
+            )
+            .click();
+
+        };
+
+
+        row.appendChild(chip);
+
+      }
+    );
+
+
+    /* -------------------------------------------------------
+       그 외 직접 업로드
+       ------------------------------------------------------- */
 
     const customChip =
       document.createElement('div');
@@ -937,7 +1175,8 @@
 
     const isCustomSelected =
       selections[cat.key] &&
-      selections[cat.key].id === 'custom';
+      selections[cat.key].id ===
+        'custom';
 
 
     customChip.className =
@@ -963,7 +1202,10 @@
     };
 
 
-    row.appendChild(customChip);
+    row.appendChild(
+      customChip
+    );
+
 
     body.appendChild(row);
 
@@ -982,9 +1224,13 @@
   ){
 
     selections[catKey] = {
-      id,
-      label,
-      img: imgSrc
+
+      id:id,
+
+      label:label,
+
+      img:imgSrc
+
     };
 
 
@@ -1003,11 +1249,13 @@
     if(imgSrc){
 
       photoEl.innerHTML = `
+
         <img
           src="${imgSrc}"
           alt="${label}"
           crossorigin="anonymous"
         >
+
       `;
 
     }
@@ -1037,14 +1285,15 @@
 
 
   /* =========================================================
-     직접 업로드
+     직접 사진 업로드
      ========================================================= */
 
   document
     .getElementById(
       'fileInputCustom'
     )
-    .onchange = function(e){
+    .onchange =
+    function(e){
 
       const file =
         e.target.files[0];
@@ -1061,22 +1310,28 @@
         new FileReader();
 
 
-      reader.onload = function(evt){
+      reader.onload =
+        function(evt){
 
-        const cat =
-          CATEGORIES[
-            currentCategoryIndex
-          ];
+          const cat =
+            CATEGORIES[
+              currentCategoryIndex
+            ];
 
 
-        selectOption(
-          cat.key,
-          'custom',
-          '직접 입력',
-          evt.target.result
-        );
+          selectOption(
 
-      };
+            cat.key,
+
+            'custom',
+
+            '직접 입력',
+
+            evt.target.result
+
+          );
+
+        };
 
 
       reader.readAsDataURL(file);
@@ -1094,7 +1349,8 @@
     .getElementById(
       'fileInputPin'
     )
-    .onchange = function(e){
+    .onchange =
+    function(e){
 
       const file =
         e.target.files[0];
@@ -1114,48 +1370,54 @@
         new FileReader();
 
 
-      reader.onload = function(evt){
+      reader.onload =
+        function(evt){
 
-        const pinKey =
-          `${targetPinInfo.catKey}_${targetPinInfo.optId}`;
-
-
-        customPins[pinKey] =
-          evt.target.result;
+          const pinKey =
+            `${targetPinInfo.catKey}_${targetPinInfo.optId}`;
 
 
-        const currentSel =
-          selections[
-            targetPinInfo.catKey
-          ];
+          customPins[pinKey] =
+            evt.target.result;
 
 
-        if(
-          currentSel &&
-          currentSel.id ===
-            targetPinInfo.optId
-        ){
+          const currentSel =
+            selections[
+              targetPinInfo.catKey
+            ];
 
-          selectOption(
-            targetPinInfo.catKey,
-            targetPinInfo.optId,
-            currentSel.label,
-            evt.target.result
+
+          if(
+            currentSel &&
+            currentSel.id ===
+              targetPinInfo.optId
+          ){
+
+            selectOption(
+
+              targetPinInfo.catKey,
+
+              targetPinInfo.optId,
+
+              currentSel.label,
+
+              evt.target.result
+
+            );
+
+          }
+          else{
+
+            renderOptions();
+
+          }
+
+
+          showToast(
+            '고정 사진이 지정되었습니다.'
           );
 
-        }
-        else{
-
-          renderOptions();
-
-        }
-
-
-        showToast(
-          '고정 사진이 지정되었습니다.'
-        );
-
-      };
+        };
 
 
       reader.readAsDataURL(file);
@@ -1166,57 +1428,275 @@
 
 
   /* =========================================================
-     이미지 저장
+     모바일 / PC 이미지 저장
      ========================================================= */
 
   document
-    .getElementById(
-      'saveBtn'
-    )
-    .onclick = function(){
+    .getElementById('saveBtn')
+    .onclick =
+    async function(){
 
-      const captureEl =
+      const saveBtn =
         document.getElementById(
-          'capture'
+          'saveBtn'
         );
 
 
-      html2canvas(
-        captureEl,
-        {
-          scale:2,
+      /* 버튼 중복 클릭 방지 */
 
-          useCORS:true,
+      if(saveBtn.dataset.saving === 'true'){
 
-          allowTaint:false,
+        return;
 
-          backgroundColor:'#000',
+      }
 
-          imageTimeout:15000,
 
-          logging:false
+      saveBtn.dataset.saving = 'true';
+
+      saveBtn.disabled = true;
+
+      saveBtn.textContent =
+        '이미지 생성 중...';
+
+
+      try{
+
+        const captureEl =
+          document.getElementById(
+            'capture'
+          );
+
+
+        /* ---------------------------------------------------
+           html2canvas로 표 캡처
+           --------------------------------------------------- */
+
+        const canvas =
+          await html2canvas(
+            captureEl,
+            {
+
+              scale:2,
+
+              useCORS:true,
+
+              allowTaint:false,
+
+              backgroundColor:'#000',
+
+              imageTimeout:15000,
+
+              logging:false
+
+            }
+          );
+
+
+        /* ---------------------------------------------------
+           canvas → PNG Blob
+
+           toDataURL 대신 Blob을 사용해서
+           모바일 브라우저 대응력을 높임
+           --------------------------------------------------- */
+
+        const blob =
+          await new Promise(
+            (resolve, reject) => {
+
+              canvas.toBlob(
+                result => {
+
+                  if(result){
+
+                    resolve(result);
+
+                  }
+                  else{
+
+                    reject(
+                      new Error(
+                        'PNG 생성에 실패했습니다.'
+                      )
+                    );
+
+                  }
+
+                },
+
+                'image/png',
+
+                1.0
+              );
+
+            }
+          );
+
+
+        const fileName =
+          '넨석_취향표.png';
+
+
+        /* ---------------------------------------------------
+           모바일 공유 기능 확인
+
+           iPhone / iPad / 일부 Android에서는
+           이 방식으로 사진 저장 또는 공유 가능
+           --------------------------------------------------- */
+
+        if(
+          typeof navigator !== 'undefined' &&
+          navigator.share &&
+          typeof File !== 'undefined'
+        ){
+
+          try{
+
+            const file =
+              new File(
+                [blob],
+                fileName,
+                {
+                  type:'image/png'
+                }
+              );
+
+
+            let canShareFiles = false;
+
+
+            if(
+              navigator.canShare
+            ){
+
+              try{
+
+                canShareFiles =
+                  navigator.canShare({
+                    files:[file]
+                  });
+
+              }
+              catch(e){
+
+                canShareFiles = false;
+
+              }
+
+            }
+
+
+            if(canShareFiles){
+
+              await navigator.share({
+
+                files:[file],
+
+                title:'넨석 취향표',
+
+                text:'넨석 취향표 이미지'
+
+              });
+
+
+              showToast(
+                '이미지 저장/공유 메뉴를 완료했습니다.'
+              );
+
+
+              return;
+
+            }
+
+          }
+          catch(shareError){
+
+            /*
+              사용자가 공유창을 닫은 경우에는
+              오류 메시지를 띄우지 않고 종료합니다.
+            */
+
+            if(
+              shareError &&
+              shareError.name ===
+                'AbortError'
+            ){
+
+              return;
+
+            }
+
+            console.log(
+              '모바일 공유 방식 실패:',
+              shareError
+            );
+
+          }
+
         }
-      )
-      .then(canvas => {
+
+
+        /* ---------------------------------------------------
+           Blob URL 다운로드
+
+           Android Chrome / PC 등에서 사용
+           --------------------------------------------------- */
+
+        const blobUrl =
+          URL.createObjectURL(blob);
+
 
         const link =
           document.createElement('a');
 
 
-        link.download =
-          '넨석_취향표.png';
-
-
         link.href =
-          canvas.toDataURL(
-            'image/png'
-          );
+          blobUrl;
+
+
+        link.download =
+          fileName;
+
+
+        link.style.display =
+          'none';
+
+
+        document.body.appendChild(
+          link
+        );
 
 
         link.click();
 
-      })
-      .catch(err => {
+
+        /*
+          너무 빨리 revoke하면 일부 모바일 브라우저에서
+          다운로드가 시작되기 전에 URL이 사라질 수 있으므로
+          잠시 기다립니다.
+        */
+
+        setTimeout(
+          () => {
+
+            URL.revokeObjectURL(
+              blobUrl
+            );
+
+            link.remove();
+
+          },
+
+          10000
+        );
+
+
+        showToast(
+          '이미지 저장을 시작했습니다.'
+        );
+
+
+      }
+      catch(err){
 
         console.error(
           '이미지 저장 오류:',
@@ -1225,10 +1705,22 @@
 
 
         showToast(
-          '이미지 저장에 실패했습니다. 콘솔을 확인해주세요.'
+          '이미지 저장에 실패했습니다. 다시 시도해주세요.'
         );
 
-      });
+      }
+      finally{
+
+        saveBtn.dataset.saving =
+          'false';
+
+        saveBtn.disabled =
+          false;
+
+        saveBtn.textContent =
+          '이미지로 저장';
+
+      }
 
     };
 
@@ -1238,10 +1730,9 @@
      ========================================================= */
 
   document
-    .getElementById(
-      'resetBtn'
-    )
-    .onclick = function(){
+    .getElementById('resetBtn')
+    .onclick =
+    function(){
 
       if(
         !confirm(
@@ -1254,36 +1745,45 @@
       }
 
 
-      CATEGORIES.forEach(cat => {
+      CATEGORIES.forEach(
+        cat => {
 
-        delete selections[cat.key];
+          delete selections[
+            cat.key
+          ];
 
 
-        const photoEl =
-          document.getElementById(
-            `photo-${cat.key}`
+          const photoEl =
+            document.getElementById(
+              `photo-${cat.key}`
+            );
+
+
+          const captionEl =
+            document.getElementById(
+              `caption-${cat.key}`
+            );
+
+
+          /*
+            초기화하면
+            기본 이미지로 돌아갑니다.
+          */
+
+          photoEl.innerHTML =
+            getDefaultImageHTML();
+
+
+          captionEl.textContent =
+            '';
+
+
+          captionEl.classList.add(
+            'placeholder'
           );
 
-
-        const captionEl =
-          document.getElementById(
-            `caption-${cat.key}`
-          );
-
-
-        /* 초기화 시 기본 이미지로 복구 */
-
-        photoEl.innerHTML =
-          getDefaultImageHTML();
-
-
-        captionEl.textContent = '';
-
-        captionEl.classList.add(
-          'placeholder'
-        );
-
-      });
+        }
+      );
 
 
       renderOptions();
@@ -1306,8 +1806,10 @@
 
   renderOptions();
 
+
 })();
 </script>
 
 </body>
 </html>
+```
