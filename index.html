@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -8,11 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link
-  href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
-  rel="stylesheet"
->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
 
@@ -97,9 +94,7 @@
   }
 
 
-  /* =========================================================
-     4 x 2 그리드
-     ========================================================= */
+  /* 4 x 2 그리드 */
 
   .op-grid{
     display:grid;
@@ -127,10 +122,10 @@
 
 
   /* =========================================================
-     사진
+     사진 영역
 
-     화면에서는 cover로 표시
-     다운로드할 때는 JS가 실제 크롭 이미지로 변환
+     사진의 원본 비율은 유지하고,
+     정사각형 칸에 맞춰 크롭합니다.
      ========================================================= */
 
   .op-photo{
@@ -145,8 +140,13 @@
   .op-photo img{
     width:100%;
     height:100%;
+
+    /* 사진 비율 유지 + 넘치는 부분 크롭 */
     object-fit:cover;
+
+    /* 사진 중앙을 기준으로 크롭 */
     object-position:center center;
+
     display:block;
   }
 
@@ -233,7 +233,7 @@
   }
 
   .tab-btn.active{
-    background:#000;
+    background:var(--ink);
     color:#fff;
   }
 
@@ -270,7 +270,7 @@
   }
 
   .opt-chip.selected{
-    border-color:#000;
+    border-color:var(--ink);
     background:#f2f2f2;
     font-weight:700;
   }
@@ -287,8 +287,11 @@
   .opt-chip .mini-thumb img{
     width:100%;
     height:100%;
+
+    /* 썸네일도 원본 비율 유지 + 크롭 */
     object-fit:cover;
     object-position:center center;
+
     display:block;
   }
 
@@ -348,7 +351,7 @@
 
 
   /* =========================================================
-     안내
+     안내 문구
      ========================================================= */
 
   .hint{
@@ -377,7 +380,7 @@
     opacity:0;
     pointer-events:none;
     transition:all .2s ease;
-    z-index:99999;
+    z-index:9999;
     max-width:90%;
     text-align:center;
   }
@@ -406,6 +409,14 @@
     .tab-btn{
       font-size:11px;
       padding:8px 1px;
+    }
+
+    .actions{
+      flex-direction:row;
+    }
+
+    .action-btn{
+      padding:10px 16px;
     }
 
   }
@@ -452,6 +463,7 @@
 
     </div>
 
+
     <div
       class="op-grid"
       id="opGrid"
@@ -461,7 +473,7 @@
 
 
   <!-- =======================================================
-       선택 패널
+       컨트롤 패널
        ======================================================= -->
 
   <div class="panel">
@@ -479,7 +491,7 @@
   </div>
 
 
-  <!-- 파일 입력 -->
+  <!-- 파일 업로드 -->
 
   <input
     type="file"
@@ -788,7 +800,7 @@
 
 
   /* =========================================================
-     기본 이미지
+     기본 이미지 HTML
      ========================================================= */
 
   function getDefaultImageHTML(){
@@ -817,10 +829,12 @@
 
     t.classList.add('show');
 
-    setTimeout(
-      () => t.classList.remove('show'),
-      2500
-    );
+
+    setTimeout(() => {
+
+      t.classList.remove('show');
+
+    }, 2500);
 
   }
 
@@ -844,25 +858,21 @@
 
       cell.className = 'op-cell';
 
-      cell.dataset.key =
-        cat.key;
+      cell.dataset.key = cat.key;
 
 
       const head =
         document.createElement('div');
 
-      head.className =
-        'op-head';
+      head.className = 'op-head';
 
-      head.textContent =
-        cat.name;
+      head.textContent = cat.name;
 
 
       const photo =
         document.createElement('div');
 
-      photo.className =
-        'op-photo';
+      photo.className = 'op-photo';
 
       photo.id =
         `photo-${cat.key}`;
@@ -883,8 +893,7 @@
       caption.id =
         `caption-${cat.key}`;
 
-      caption.contentEditable =
-        true;
+      caption.contentEditable = true;
 
       caption.setAttribute(
         'spellcheck',
@@ -911,7 +920,7 @@
 
 
   /* =========================================================
-     탭
+     탭 생성
      ========================================================= */
 
   function initTabs(){
@@ -951,15 +960,17 @@
         };
 
 
-        tabsContainer.appendChild(
-          btn
-        );
+        tabsContainer.appendChild(btn);
 
       }
     );
 
   }
 
+
+  /* =========================================================
+     탭 렌더링
+     ========================================================= */
 
   function renderTabs(){
 
@@ -997,7 +1008,7 @@
 
 
   /* =========================================================
-     옵션
+     옵션 렌더링
      ========================================================= */
 
   function renderOptions(){
@@ -1022,6 +1033,10 @@
     row.className =
       'options-row';
 
+
+    /* -------------------------------------------------------
+       기본 옵션
+       ------------------------------------------------------- */
 
     cat.options.forEach(
       opt => {
@@ -1059,7 +1074,6 @@
         if(displayImg){
 
           thumbHtml = `
-
             <div class="mini-thumb">
 
               <img
@@ -1068,7 +1082,6 @@
               >
 
             </div>
-
           `;
 
         }
@@ -1146,15 +1159,15 @@
         };
 
 
-        row.appendChild(
-          chip
-        );
+        row.appendChild(chip);
 
       }
     );
 
 
-    /* 그 외 */
+    /* -------------------------------------------------------
+       그 외 직접 업로드
+       ------------------------------------------------------- */
 
     const customChip =
       document.createElement('div');
@@ -1194,15 +1207,13 @@
     );
 
 
-    body.appendChild(
-      row
-    );
+    body.appendChild(row);
 
   }
 
 
   /* =========================================================
-     선택
+     옵션 선택
      ========================================================= */
 
   function selectOption(
@@ -1274,7 +1285,7 @@
 
 
   /* =========================================================
-     직접 업로드
+     직접 사진 업로드
      ========================================================= */
 
   document
@@ -1417,234 +1428,154 @@
 
 
   /* =========================================================
-     ★ 핵심 ★
-     실제 사진을 비율 유지 상태로 크롭해서
-     새로운 정사각형 이미지로 만드는 함수
+     모바일 / PC 이미지 저장
 
-     화면의 object-fit:cover와 동일한 결과를
-     실제 픽셀로 만들어준다.
+     ★ 다운로드용 이미지 크롭 처리
+
+     화면에서는 CSS의 object-fit:cover를 사용하지만,
+     html2canvas가 object-fit을 브라우저마다 다르게 처리할 수 있습니다.
+
+     그래서 저장할 때만 각 사진을 실제 픽셀로 중앙 크롭한
+     <canvas>로 임시 교체한 뒤 html2canvas로 캡처합니다.
+
+     이렇게 하면 다운로드 결과에서도 사진이 절대 찌그러지지 않습니다.
      ========================================================= */
 
-  function createCroppedImage(
-    img,
-    targetWidth,
-    targetHeight
-  ){
+  function waitForImage(img){
 
-    return new Promise(
-      (resolve, reject) => {
+    return new Promise(resolve => {
 
-        const source =
-          new Image();
-
-
-        source.crossOrigin =
-          'anonymous';
-
-
-        source.onload =
-          function(){
-
-            try{
-
-              const sw =
-                source.naturalWidth ||
-                source.width;
-
-
-              const sh =
-                source.naturalHeight ||
-                source.height;
-
-
-              if(
-                !sw ||
-                !sh
-              ){
-
-                reject(
-                  new Error(
-                    '이미지 크기를 확인할 수 없습니다.'
-                  )
-                );
-
-                return;
-
-              }
-
-
-              /*
-                cover 계산
-
-                원본 비율:
-                sw / sh
-
-                목표 비율:
-                targetWidth / targetHeight
-              */
-
-
-              const sourceRatio =
-                sw / sh;
-
-
-              const targetRatio =
-                targetWidth /
-                targetHeight;
-
-
-              let cropWidth =
-                sw;
-
-              let cropHeight =
-                sh;
-
-
-              let sourceX = 0;
-
-              let sourceY = 0;
-
-
-              if(
-                sourceRatio >
-                targetRatio
-              ){
-
-                /*
-                  원본이 더 가로로 김
-
-                  좌우를 잘라냄
-                */
-
-                cropWidth =
-                  sh *
-                  targetRatio;
-
-                sourceX =
-                  (sw -
-                    cropWidth) /
-                  2;
-
-              }
-              else{
-
-                /*
-                  원본이 더 세로로 김
-
-                  위아래를 잘라냄
-                */
-
-                cropHeight =
-                  sw /
-                  targetRatio;
-
-                sourceY =
-                  (sh -
-                    cropHeight) /
-                  2;
-
-              }
-
-
-              const canvas =
-                document.createElement(
-                  'canvas'
-                );
-
-
-              /*
-                충분히 큰 정사각형으로
-                만들어서 화질 손실을 줄임
-              */
-
-              const outputSize =
-                Math.max(
-                  1000,
-                  targetWidth,
-                  targetHeight
-                );
-
-
-              canvas.width =
-                outputSize;
-
-              canvas.height =
-                outputSize;
-
-
-              const ctx =
-                canvas.getContext(
-                  '2d'
-                );
-
-
-              ctx.drawImage(
-
-                source,
-
-                sourceX,
-                sourceY,
-                cropWidth,
-                cropHeight,
-
-                0,
-                0,
-                outputSize,
-                outputSize
-
-              );
-
-
-              resolve(
-                canvas.toDataURL(
-                  'image/png',
-                  1
-                )
-              );
-
-            }
-            catch(error){
-
-              reject(error);
-
-            }
-
-          };
-
-
-        source.onerror =
-          function(){
-
-            reject(
-              new Error(
-                '이미지를 불러오지 못했습니다.'
-              )
-            );
-
-          };
-
-
-        source.src =
-          img.currentSrc ||
-          img.src;
-
+      if(img.complete && img.naturalWidth > 0){
+        resolve();
+        return;
       }
-    );
+
+      const done = () => {
+        img.removeEventListener('load', done);
+        img.removeEventListener('error', done);
+        resolve();
+      };
+
+      img.addEventListener('load', done, {once:true});
+      img.addEventListener('error', done, {once:true});
+
+    });
 
   }
 
 
-  /* =========================================================
-     ★ 다운로드용 크롭 처리
+  function makeCropCanvas(img, width, height){
 
-     현재 화면의 사진을 잠시 실제 크롭 이미지로 바꾼다.
-     html2canvas가 이 이미지를 그대로 캡처한다.
-     캡처가 끝나면 원래 이미지로 되돌린다.
-     ========================================================= */
+    const sourceWidth =
+      img.naturalWidth || img.width;
 
-  async function prepareImagesForCapture(){
+    const sourceHeight =
+      img.naturalHeight || img.height;
 
-    const images =
+    if(!sourceWidth || !sourceHeight){
+      return null;
+    }
+
+
+    const sourceRatio =
+      sourceWidth / sourceHeight;
+
+    const targetRatio =
+      width / height;
+
+
+    let cropWidth = sourceWidth;
+    let cropHeight = sourceHeight;
+    let sourceX = 0;
+    let sourceY = 0;
+
+
+    /*
+      object-fit:cover와 동일한 계산입니다.
+
+      가로가 더 긴 사진이면 좌우를 자르고,
+      세로가 더 긴 사진이면 위아래를 자릅니다.
+    */
+
+    if(sourceRatio > targetRatio){
+
+      cropWidth =
+        sourceHeight * targetRatio;
+
+      sourceX =
+        (sourceWidth - cropWidth) / 2;
+
+    }
+    else if(sourceRatio < targetRatio){
+
+      cropHeight =
+        sourceWidth / targetRatio;
+
+      sourceY =
+        (sourceHeight - cropHeight) / 2;
+
+    }
+
+
+    /*
+      캡처용 캔버스는 충분히 크게 만들어
+      저장 이미지가 흐려지는 것을 최소화합니다.
+    */
+
+    const outputSize = 1200;
+
+    const canvas =
+      document.createElement('canvas');
+
+    canvas.width = outputSize;
+    canvas.height = outputSize;
+
+
+    const ctx =
+      canvas.getContext('2d');
+
+    if(!ctx){
+      return null;
+    }
+
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+
+    ctx.drawImage(
+      img,
+      sourceX,
+      sourceY,
+      cropWidth,
+      cropHeight,
+      0,
+      0,
+      outputSize,
+      outputSize
+    );
+
+
+    /*
+      화면의 img와 같은 크기로 보이도록
+      canvas에도 필요한 스타일을 적용합니다.
+    */
+
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.display = 'block';
+
+
+    return canvas;
+
+  }
+
+
+  async function prepareCaptureImages(){
+
+    const restoreList = [];
+
+    const photoImages =
       Array.from(
         document.querySelectorAll(
           '#capture .op-photo img'
@@ -1652,239 +1583,142 @@
       );
 
 
-    const restoreList = [];
+    for(const img of photoImages){
 
-
-    for(
-      const img of images
-    ){
-
-      /*
-        이미지가 아직 로딩 중이면 기다림
-      */
-
-      if(
-        !img.complete
-      ){
-
-        await new Promise(
-          resolve => {
-
-            img.onload =
-              resolve;
-
-            img.onerror =
-              resolve;
-
-          }
-        );
-
-      }
-
+      await waitForImage(img);
 
       const photoBox =
-        img.closest(
-          '.op-photo'
-        );
-
+        img.closest('.op-photo');
 
       if(!photoBox){
-
         continue;
-
       }
 
+
+      /*
+        실제 화면의 사진 영역 비율을 사용합니다.
+        현재는 정사각형이므로 1:1입니다.
+      */
 
       const rect =
         photoBox.getBoundingClientRect();
 
-
-      /*
-        CSS 픽셀 크기보다 크게 만들어
-        다운로드 이미지의 화질을 확보
-      */
-
       const width =
-        Math.max(
-          1000,
-          Math.round(
-            rect.width * 2
-          )
-        );
-
+        Math.max(1, Math.round(rect.width));
 
       const height =
-        Math.max(
-          1000,
-          Math.round(
-            rect.height * 2
-          )
-        );
+        Math.max(1, Math.round(rect.height));
 
 
-      const originalSrc =
-        img.getAttribute(
-          'src'
-        );
-
-
-      const originalSrcset =
-        img.getAttribute(
-          'srcset'
-        );
+      let cropCanvas = null;
 
 
       try{
 
-        const croppedSrc =
-          await createCroppedImage(
+        cropCanvas =
+          makeCropCanvas(
             img,
             width,
             height
           );
 
-
-        restoreList.push({
-
-          img:img,
-
-          src:originalSrc,
-
-          srcset:originalSrcset
-
-        });
-
-
-        /*
-          html2canvas가 이제
-          object-fit을 해석할 필요 없이
-          이미 완성된 정사각형 이미지를 캡처함
-        */
-
-        img.removeAttribute(
-          'srcset'
-        );
-
-        img.src =
-          croppedSrc;
-
-        img.style.objectFit =
-          'fill';
-
-        img.style.width =
-          '100%';
-
-        img.style.height =
-          '100%';
-
       }
       catch(error){
 
-        console.warn(
-          '사진 크롭 실패:',
+        console.error(
+          '사진 크롭 오류:',
           error
         );
 
       }
 
+
+      if(!cropCanvas){
+        continue;
+      }
+
+
+      /*
+        html2canvas가 img의 object-fit을 해석할 필요가 없도록
+        실제 픽셀이 들어 있는 canvas로 교체합니다.
+      */
+
+      const parent =
+        img.parentNode;
+
+      if(!parent){
+        continue;
+      }
+
+
+      const nextSibling =
+        img.nextSibling;
+
+
+      parent.replaceChild(
+        cropCanvas,
+        img
+      );
+
+
+      restoreList.push({
+        parent,
+        img,
+        cropCanvas,
+        nextSibling
+      });
+
     }
 
 
-    return function restoreImages(){
+    /*
+      html2canvas가 바로 시작되기 전에 브라우저가
+      DOM 변경을 반영할 한 프레임을 기다립니다.
+    */
 
-      restoreList.forEach(
-        item => {
-
-          if(
-            item.srcset !== null
-          ){
-
-            item.img.setAttribute(
-              'srcset',
-              item.srcset
-            );
-
-          }
-          else{
-
-            item.img.removeAttribute(
-              'srcset'
-            );
-
-          }
+    await new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
 
 
-          item.img.src =
-            item.src;
+    return function restore(){
 
+      restoreList.forEach(item => {
 
-          item.img.style.objectFit =
-            '';
+        if(
+          item.nextSibling &&
+          item.nextSibling.parentNode ===
+            item.parent
+        ){
 
-          item.img.style.width =
-            '';
-
-          item.img.style.height =
-            '';
+          item.parent.insertBefore(
+            item.img,
+            item.nextSibling
+          );
 
         }
-      );
+        else{
+
+          item.parent.appendChild(
+            item.img
+          );
+
+        }
+
+
+        item.cropCanvas.remove();
+
+      });
 
     };
 
   }
 
 
-  /* =========================================================
-     canvas → Blob
-     ========================================================= */
-
-  function canvasToBlob(
-    canvas
-  ){
-
-    return new Promise(
-      (resolve, reject) => {
-
-        canvas.toBlob(
-          blob => {
-
-            if(blob){
-
-              resolve(blob);
-
-            }
-            else{
-
-              reject(
-                new Error(
-                  'PNG 생성 실패'
-                )
-              );
-
-            }
-
-          },
-
-          'image/png',
-
-          1.0
-        );
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     ★ 이미지 저장
-     ========================================================= */
-
   document
-    .getElementById(
-      'saveBtn'
-    )
+    .getElementById('saveBtn')
     .onclick =
     async function(){
 
@@ -1893,6 +1727,8 @@
           'saveBtn'
         );
 
+
+      /* 버튼 중복 클릭 방지 */
 
       if(
         saveBtn.dataset.saving ===
@@ -1907,15 +1743,13 @@
       saveBtn.dataset.saving =
         'true';
 
-      saveBtn.disabled =
-        true;
+      saveBtn.disabled = true;
 
       saveBtn.textContent =
         '이미지 생성 중...';
 
 
-      let restoreImages =
-        null;
+      let restoreImages = null;
 
 
       try{
@@ -1926,71 +1760,76 @@
           );
 
 
-        /*
-          -----------------------------------------------------
-          1. 사진을 실제 크롭 이미지로 변경
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           1. 사진을 실제 크롭 캔버스로 교체
+           --------------------------------------------------- */
 
         restoreImages =
-          await prepareImagesForCapture();
+          await prepareCaptureImages();
 
 
-        /*
-          -----------------------------------------------------
-          2. html2canvas 캡처
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           2. html2canvas로 표 캡처
+
+           이제 사진은 <img>가 아니라
+           실제 픽셀이 들어 있는 <canvas>이므로
+           object-fit 문제 자체가 발생하지 않습니다.
+           --------------------------------------------------- */
 
         const canvas =
           await html2canvas(
             captureEl,
             {
-
               scale:2,
-
               useCORS:true,
-
               allowTaint:false,
-
               backgroundColor:'#000',
-
               imageTimeout:15000,
-
               logging:false
-
             }
           );
 
 
-        /*
-          -----------------------------------------------------
-          3. 캡처가 끝났으므로
-             화면 이미지를 원래대로 복구
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           3. 화면 원상복구
+           --------------------------------------------------- */
 
-        if(
-          restoreImages
-        ){
+        if(restoreImages){
 
           restoreImages();
-
-          restoreImages =
-            null;
+          restoreImages = null;
 
         }
 
 
-        /*
-          -----------------------------------------------------
-          4. PNG Blob 생성
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           4. canvas → PNG Blob
+           --------------------------------------------------- */
 
         const blob =
-          await canvasToBlob(
-            canvas
+          await new Promise(
+            (resolve, reject) => {
+
+              canvas.toBlob(
+                result => {
+
+                  if(result){
+                    resolve(result);
+                  }
+                  else{
+                    reject(
+                      new Error(
+                        'PNG 생성에 실패했습니다.'
+                      )
+                    );
+                  }
+
+                },
+                'image/png',
+                1.0
+              );
+
+            }
           );
 
 
@@ -1998,19 +1837,14 @@
           '넨석_취향표.png';
 
 
-        /*
-          -----------------------------------------------------
-          5. 모바일 공유 기능
-
-          iPhone/iPad 등에서는
-          공유 메뉴를 이용해 사진 앱에 저장 가능
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           5. 모바일 공유 기능
+           --------------------------------------------------- */
 
         if(
+          typeof navigator !== 'undefined' &&
           navigator.share &&
-          typeof File !==
-            'undefined'
+          typeof File !== 'undefined'
         ){
 
           try{
@@ -2025,17 +1859,14 @@
               );
 
 
-            let canShare =
-              false;
+            let canShareFiles = false;
 
 
-            if(
-              navigator.canShare
-            ){
+            if(navigator.canShare){
 
               try{
 
-                canShare =
+                canShareFiles =
                   navigator.canShare({
                     files:[file]
                   });
@@ -2043,26 +1874,19 @@
               }
               catch(e){
 
-                canShare =
-                  false;
+                canShareFiles = false;
 
               }
 
             }
 
 
-            if(canShare){
+            if(canShareFiles){
 
               await navigator.share({
-
                 files:[file],
-
-                title:
-                  '넨석 취향표',
-
-                text:
-                  '넨석 취향표 이미지'
-
+                title:'넨석 취향표',
+                text:'넨석 취향표 이미지'
               });
 
 
@@ -2070,17 +1894,12 @@
                 '이미지 저장/공유 메뉴를 완료했습니다.'
               );
 
-
               return;
 
             }
 
           }
           catch(shareError){
-
-            /*
-              사용자가 공유창을 닫은 경우
-            */
 
             if(
               shareError &&
@@ -2092,8 +1911,9 @@
 
             }
 
+
             console.log(
-              '공유 저장 실패:',
+              '모바일 공유 방식 실패:',
               shareError
             );
 
@@ -2102,87 +1922,58 @@
         }
 
 
-        /*
-          -----------------------------------------------------
-          6. PC / Android 다운로드
-          -----------------------------------------------------
-        */
+        /* ---------------------------------------------------
+           6. Blob URL 다운로드
+           --------------------------------------------------- */
 
         const blobUrl =
-          URL.createObjectURL(
-            blob
-          );
+          URL.createObjectURL(blob);
 
 
         const link =
-          document.createElement(
-            'a'
-          );
+          document.createElement('a');
+
+        link.href = blobUrl;
+        link.download = fileName;
+        link.style.display = 'none';
 
 
-        link.href =
-          blobUrl;
-
-        link.download =
-          fileName;
-
-        link.style.display =
-          'none';
-
-
-        document.body.appendChild(
-          link
-        );
-
+        document.body.appendChild(link);
 
         link.click();
 
 
-        setTimeout(
-          () => {
+        setTimeout(() => {
 
-            URL.revokeObjectURL(
-              blobUrl
-            );
+          URL.revokeObjectURL(blobUrl);
+          link.remove();
 
-            link.remove();
-
-          },
-          10000
-        );
+        }, 10000);
 
 
         showToast(
           '이미지 저장을 시작했습니다.'
         );
 
+
       }
-      catch(error){
+      catch(err){
 
         console.error(
           '이미지 저장 오류:',
-          error
+          err
         );
 
 
-        /*
-          오류가 나더라도
-          화면의 원본 이미지는 반드시 복구
-        */
+        /* 오류가 나도 화면 이미지는 반드시 복구 */
 
-        if(
-          restoreImages
-        ){
+        if(restoreImages){
 
           try{
-
             restoreImages();
-
           }
           catch(e){
-
             console.error(e);
-
           }
 
         }
@@ -2198,8 +1989,7 @@
         saveBtn.dataset.saving =
           'false';
 
-        saveBtn.disabled =
-          false;
+        saveBtn.disabled = false;
 
         saveBtn.textContent =
           '이미지로 저장';
@@ -2214,9 +2004,7 @@
      ========================================================= */
 
   document
-    .getElementById(
-      'resetBtn'
-    )
+    .getElementById('resetBtn')
     .onclick =
     function(){
 
@@ -2253,7 +2041,7 @@
 
           /*
             초기화하면
-            기본 이미지로 돌아감
+            기본 이미지로 돌아갑니다.
           */
 
           photoEl.innerHTML =
@@ -2292,8 +2080,10 @@
 
   renderOptions();
 
+
 })();
 </script>
 
 </body>
 </html>
+```
