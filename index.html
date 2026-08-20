@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>넨석 취향표 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --line:#c9c9c9;
+    --ink:#000;
+    --muted:#888;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#f2f2f2;
+    color:#222;
+    font-family:'Noto Sans KR', sans-serif;
+    min-height:100vh;
+  }
+  .page{
+    max-width:640px;
+    margin:0 auto;
+    padding:32px 16px 70px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  h1{
+    font-size:24px;
+    font-weight:900;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  /* ===== 표(캡처 영역) ===== */
+  #capture{
+    background:#000;
+    border:3px solid #000;
+  }
+  .capture-title{
+    padding:16px 10px 14px;
+    text-align:center;
+  }
+  .chart-title{
+    font-size:22px;
+    font-weight:900;
+    color:#fff;
+    outline:none;
+  }
+  .chart-handle{
+    font-size:12px;
+    color:rgba(255,255,255,0.65);
+    outline:none;
+    margin-top:2px;
+  }
+  [contenteditable]:focus{ background:rgba(255,255,255,0.12); }
+
+  /* 4x2 그리드 배열 설정 */
+  .op-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:3px;
+    background:#000;
+  }
+  .op-cell{
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+  }
+  .op-head{
+    background:#000;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    text-align:center;
+    padding:7px 2px;
+    letter-spacing:0.01em;
+    word-break:keep-all;
+  }
+  .op-photo{
+    aspect-ratio:1/1;
+    background:#e9e9e9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .op-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .op-photo .empty-label{
+    font-size:11px;
+    color:#aaa;
+    text-align:center;
+  }
+  .op-caption[contenteditable]{ outline:none; cursor:text; }
+  .op-caption[contenteditable]:empty::before{
+    content:attr(data-placeholder);
+    color:#bbb;
+    font-weight:400;
+  }
+  .op-caption{
+    background:#fff;
+    color:#000;
+    font-weight:700;
+    font-size:12px;
+    text-align:center;
+    padding:6px 2px;
+    border-top:2px solid #000;
+    word-break:break-all;
+  }
+  .op-caption.placeholder{ color:#bbb; font-weight:400; }
+
+  /* ===== 컨트롤 패널 ===== */
+  .panel{
+    margin-top:18px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+  }
+  .tab-btn{
+    flex:1 1 auto;
+    min-width:70px;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    padding:10px 4px;
+    border:none;
+    border-right:1px solid var(--line);
+    background:#fff;
+    color:#666;
+    cursor:pointer;
+  }
+  .tab-btn:last-child{ border-right:none; }
+  .tab-btn:hover{ background:#f5f5f5; }
+  .tab-btn.active{
+    background:var(--ink);
+    color:#fff;
+  }
+
+  .options-body{ padding:12px; }
+  .pota-note{
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+    padding:10px 0;
+  }
+  .options-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .opt-chip{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid var(--line);
+    padding:6px 10px 6px 6px;
+    cursor:pointer;
+    background:#fff;
+    font-size:12px;
+    color:#222;
+  }
+  .opt-chip:hover{ border-color:#999; }
+  .opt-chip.selected{
+    border-color:var(--ink);
+    background:#f2f2f2;
+    font-weight:700;
+  }
+  .opt-chip .mini-thumb{
+    width:26px; height:26px;
+    background:#eee;
+    border:1px solid var(--line);
+    overflow:hidden;
+    flex:0 0 auto;
+  }
+  .opt-chip .mini-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .opt-chip .pin-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:12px;
+    color:#999;
+    padding:0 0 0 2px;
+    line-height:1;
+  }
+  .opt-chip .pin-btn:hover{ color:#000; }
+  .opt-chip.custom{ border-style:dashed; }
+
+  .actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:18px;
+  }
+  .action-btn{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    padding:10px 20px;
+    border-radius:2px;
+    border:1px solid #000;
+    cursor:pointer;
+  }
+  .action-btn.primary{ background:#000; color:#fff; }
+  .action-btn.ghost{ background:#fff; color:#000; }
+  .action-btn:hover{ opacity:0.85; }
+
+  .hint{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.6;
+    border-top:1px dashed var(--line);
+    padding-top:12px;
+  }
+
+  .toast{
+    position:fixed;
+    left:50%; bottom:26px;
+    transform:translateX(-50%) translateY(20px);
+    background:#000;
+    color:#fff;
+    padding:10px 18px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:all .2s ease;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:480px){
+    .op-head{ font-size:10px; padding:5px 1px; }
+    .op-caption{ font-size:11px; }
+    .tab-btn{ min-width:60px; font-size:11px; padding:8px 2px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>❤️넨석 취향표 만들기❤️</h1>
+    <p>항목별 보기를 선택해 표를 완성하고, 이미지로 저장해보세요.</p>
+  </header>
+
+  <div id="capture">
+    <div class="capture-title">
+      <div class="chart-title" contenteditable="true" spellcheck="false">나의 취향표</div>
+      <div class="chart-handle" contenteditable="true" spellcheck="false">@닉네임</div>
+    </div>
+    <div class="op-grid" id="opGrid"></div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs" id="tabs"></div>
+    <div class="options-body" id="optionsBody"></div>
+  </div>
+
+  <input type="file" id="fileInputCustom" accept="image/*" style="display:none">
+  <input type="file" id="fileInputPin" accept="image/*" style="display:none">
+
+  <div class="actions">
+    <button class="action-btn primary" id="saveBtn">이미지로 저장</button>
+    <button class="action-btn ghost" id="resetBtn">초기화</button>
+  </div>
+
+  <div class="hint">
+    📌 보기 옆의 <b>[사진]</b> 버튼을 누르면 그 보기에 고정 사진을 지정할 수 있어요.<br>
+    보기에 없는 답을 쓰고 싶다면 각 항목의 <b>[그 외]</b> 칩을 눌러 직접 사진을 올리면 됩니다.
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function(){
+  // 지정된 순서: [최애 - 최애 떡밥 - 입덕 계기 - 릴스 - 코어 - 조합명 - 모에화 - 최애 포타]
+  const CATEGORIES = [
+    {
+      key: 'choiae',
+      name: '최애',
+      options: [
+        { id: '1', label: '원빈', img: 'data:image/webp;base64,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' },
+        { id: '2', label: '은석', img: null },
+        { id: '3', label: '성찬', img: null },
+        { id: '4', label: '쇼타로', img: null },
+        { id: '5', label: '소희', img: null },
+        { id: '6', label: '앤톤', img: null }
+      ]
+    },
+    {
+      key: 'ddeokbap',
+      name: '최애 떡밥',
+      options: [
+        { id: '1', label: '비게퍼 라방', img: null },
+        { id: '2', label: '스페셜커플상', img: null },
+        { id: '3', label: '원석발견', img: null },
+        { id: '4', label: '문제 생기면 너땜에?', img: null },
+        { id: '5', label: '아육대 손잡기', img: null },
+        { id: '6', label: '아육대 승부차기', img: null },
+        { id: '7', label: '김볶밥 요리사', img: null }
+      ]
+    },
+    {
+      key: 'ipdeok',
+      name: '입덕 계기',
+      options: [] // 직접 업로드 전용
+    },
+    {
+      key: 'reels',
+      name: '릴스',
+      options: [
+        { id: '1', label: 'Cooking with', img: null },
+        { id: '2', label: '보핍보핍', img: null },
+        { id: '3', label: 'muah', img: null },
+        { id: '4', label: 'look alike', img: null },
+        { id: '5', label: '소다팝', img: null },
+        { id: '6', label: '하나둘셋 touch ya', img: null },
+        { id: '7', label: 'all of you', img: null }
+      ]
+    },
+    {
+      key: 'core',
+      name: '코어',
+      options: []
+    },
+    {
+      key: 'pair',
+      name: '조합명',
+      options: [
+        { id: '1', label: '울산바위', img: null },
+        { id: '2', label: '석과비니', img: null },
+        { id: '3', label: '왕자님즈', img: null },
+        { id: '4', label: '모지리즈', img: null },
+        { id: '5', label: '고양이 형제', img: null }
+      ]
+    },
+    {
+      key: 'moehwa',
+      name: '모에화',
+      options: [] // 직접 업로드 전용
+    },
+    {
+      key: 'pota',
+      name: '최애 포타',
+      options: []
+    }
+  ];
+
+  let currentCategoryIndex = 0;
+  const selections = {}; 
+  const customPins = {}; 
+  let targetPinInfo = null;
+
+  function showToast(text){
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function initGrid(){
+    const grid = document.getElementById('opGrid');
+    grid.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const cell = document.createElement('div');
+      cell.className = 'op-cell';
+      cell.dataset.key = cat.key;
+
+      const head = document.createElement('div');
+      head.className = 'op-head';
+      head.textContent = cat.name;
+
+      const photo = document.createElement('div');
+      photo.className = 'op-photo';
+      photo.id = `photo-${cat.key}`;
+      photo.innerHTML = `<span class="empty-label">선택 없음</span>`;
+
+      const caption = document.createElement('div');
+      caption.className = 'op-caption placeholder';
+      caption.id = `caption-${cat.key}`;
+      caption.contentEditable = true;
+      caption.setAttribute('spellcheck', 'false');
+      caption.setAttribute('data-placeholder', '직접 입력');
+
+      cell.appendChild(head);
+      cell.appendChild(photo);
+      cell.appendChild(caption);
+      grid.appendChild(cell);
+    });
+  }
+
+  function initTabs(){
+    const tabsContainer = document.getElementById('tabs');
+    tabsContainer.innerHTML = '';
+    CATEGORIES.forEach((cat, idx) => {
+      const btn = document.createElement('button');
+      btn.className = `tab-btn ${idx === currentCategoryIndex ? 'active' : ''}`;
+      btn.textContent = cat.name;
+      btn.onclick = () => {
+        currentCategoryIndex = idx;
+        renderTabs();
+        renderOptions();
+      };
+      tabsContainer.appendChild(btn);
+    });
+  }
+
+  function renderTabs(){
+    const btns = document.querySelectorAll('.tab-btn');
+    btns.forEach((btn, idx) => {
+      if(idx === currentCategoryIndex) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+
+  function renderOptions(){
+    const body = document.getElementById('optionsBody');
+    body.innerHTML = '';
+    const cat = CATEGORIES[currentCategoryIndex];
+
+    const row = document.createElement('div');
+    row.className = 'options-row';
+
+    // 1. 고정 프리셋 보기들 출력
+    cat.options.forEach(opt => {
+      const chip = document.createElement('div');
+      const isSelected = selections[cat.key] && selections[cat.key].id === opt.id;
+      chip.className = `opt-chip ${isSelected ? 'selected' : ''}`;
+
+      const pinKey = `${cat.key}_${opt.id}`;
+      const displayImg = customPins[pinKey] || opt.img;
+
+      let thumbHtml = '';
+      if(displayImg){
+        thumbHtml = `<div class="mini-thumb"><img src="${displayImg}"></div>`;
+      }
+
+      chip.innerHTML = `
+        ${thumbHtml}
+        <span>${opt.label}</span>
+        <button class="pin-btn" title="고정 사진 설정">📷</button>
+      `;
+
+      chip.onclick = (e) => {
+        if(e.target.classList.contains('pin-btn')) return;
+        selectOption(cat.key, opt.id, opt.label, displayImg);
+      };
+
+      const pinBtn = chip.querySelector('.pin-btn');
+      pinBtn.onclick = (e) => {
+        e.stopPropagation();
+        targetPinInfo = { catKey: cat.key, optId: opt.id };
+        document.getElementById('fileInputPin').click();
+      };
+
+      row.appendChild(chip);
+    });
+
+    // 2. [그 외 (직접 업로드)] 칩 생성
+    const customChip = document.createElement('div');
+    const isCustomSelected = selections[cat.key] && selections[cat.key].id === 'custom';
+    customChip.className = `opt-chip custom ${isCustomSelected ? 'selected' : ''}`;
+    customChip.innerHTML = `<span>➕ 그 외 (직접 업로드)</span>`;
+    customChip.onclick = () => {
+      document.getElementById('fileInputCustom').click();
+    };
+    row.appendChild(customChip);
+
+    body.appendChild(row);
+  }
+
+  function selectOption(catKey, id, label, imgSrc){
+    selections[catKey] = { id, label, img: imgSrc };
+
+    const photoEl = document.getElementById(`photo-${catKey}`);
+    const captionEl = document.getElementById(`caption-${catKey}`);
+
+    if(imgSrc){
+      photoEl.innerHTML = `<img src="${imgSrc}" alt="${label}">`;
+    } else {
+      photoEl.innerHTML = `<span class="empty-label">${label}</span>`;
+    }
+
+    if(label){
+      captionEl.textContent = label;
+      captionEl.classList.remove('placeholder');
+    }
+
+    renderOptions();
+  }
+
+  // 파일 업로드 이벤트 바인딩
+  document.getElementById('fileInputCustom').onchange = function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const cat = CATEGORIES[currentCategoryIndex];
+      selectOption(cat.key, 'custom', '직접 입력', evt.target.result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  document.getElementById('fileInputPin').onchange = function(e){
+    const file = e.target.files[0];
+    if(!file || !targetPinInfo) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const pinKey = `${targetPinInfo.catKey}_${targetPinInfo.optId}`;
+      customPins[pinKey] = evt.target.result;
+      
+      const currentSel = selections[targetPinInfo.catKey];
+      if(currentSel && currentSel.id === targetPinInfo.optId){
+        selectOption(targetPinInfo.catKey, targetPinInfo.optId, currentSel.label, evt.target.result);
+      } else {
+        renderOptions();
+      }
+      showToast('고정 사진이 지정되었습니다.');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // 저장 & 초기화
+  document.getElementById('saveBtn').onclick = function(){
+    const captureEl = document.getElementById('capture');
+    html2canvas(captureEl, { scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = '넨석_취향표.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  };
+
+  document.getElementById('resetBtn').onclick = function(){
+    if(!confirm('작성 내용을 초기화하시겠습니까?')) return;
+    CATEGORIES.forEach(cat => {
+      delete selections[cat.key];
+      const photoEl = document.getElementById(`photo-${cat.key}`);
+      const captionEl = document.getElementById(`caption-${cat.key}`);
+      photoEl.innerHTML = `<span class="empty-label">선택 없음</span>`;
+      captionEl.textContent = '';
+      captionEl.classList.add('placeholder');
+    });
+    renderOptions();
+    showToast('초기화되었습니다.');
+  };
+
+  // 실행
+  initGrid();
+  initTabs();
+  renderOptions();
+})();
+</script>
+</body>
+</html>
