@@ -293,9 +293,8 @@
       options: [
         { id: '1', label: '원빈', img: 'https://i.namu.wiki/i/dbmgPd-OUGISBLIKJQtQ3mM4uRCZe0FcoJfuvyZc9nyvvpXfRl3VOsl_VetPQwoM2EO_VkqOPajPMVAAneGGgPhnq4NgwB4mH5flkZAblZkkLusXbsSqK13Ee1k4OrCYnWFyUPPXXr4opO2wbjQo3Q.webp' },
         { id: '2', label: '은석', img: 'https://i.namu.wiki/i/A6zwjww1B3UNeeycxea5T_-tHTndZjpAch9CTZ8RQwx7VZTT5WIwW9AiDISiWJCL34VcXHkKWGXiplijsI1u-s_svA1wwLzIE2mFUDeRV0YVpg23TVyuynY_YDF1Y1zDs0b-qfDmJ-n4gfMTWkdTjQ.webp' }
-      ],
-    }
-    {
+      ]
+    },
       key: 'ddeokbap',
       name: '최애 떡밥',
       options: [
@@ -446,7 +445,7 @@
 
       let thumbHtml = '';
       if(displayImg){
-        thumbHtml = `<div class="mini-thumb"><img src="${displayImg}"></div>`;
+        thumbHtml = `<div class="mini-thumb"><img src="${displayImg}" crossorigin="anonymous"></div>`;
       }
 
       chip.innerHTML = `
@@ -490,7 +489,7 @@
     const captionEl = document.getElementById(`caption-${catKey}`);
 
     if(imgSrc){
-      photoEl.innerHTML = `<img src="${imgSrc}" alt="${label}">`;
+      photoEl.innerHTML = `<img src="${imgSrc}" alt="${label}" crossorigin="anonymous">`;
     } else {
       photoEl.innerHTML = `<span class="empty-label">${label}</span>`;
     }
@@ -539,11 +538,21 @@
   // 저장 & 초기화
   document.getElementById('saveBtn').onclick = function(){
     const captureEl = document.getElementById('capture');
-    html2canvas(captureEl, { scale: 2 }).then(canvas => {
+    html2canvas(captureEl, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#000',
+      imageTimeout: 15000,
+      logging: false
+    }).then(canvas => {
       const link = document.createElement('a');
       link.download = '넨석_취향표.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
+    }).catch(err => {
+      console.error('이미지 저장 오류:', err);
+      showToast('이미지 저장에 실패했습니다. 콘솔을 확인해주세요.');
     });
   };
 
